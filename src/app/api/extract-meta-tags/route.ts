@@ -11,14 +11,14 @@ interface MetaTag {
 }
 
 // In-memory counters (will reset on server restart)
-let counters = {
+const counters = {
   activeUsers: 0, // Number of users currently testing
   totalTests: 0, // Total number of tests performed
   uniqueUrls: new Set<string>(), // Set of unique URLs tested
 };
 
 // Logic to determine if a meta tag is used by Google or Bing
-const determineUsage = (name: string, content: string): { usedByGoogle: string; usedByBing: string } => {
+const determineUsage = (name: string): { usedByGoogle: string; usedByBing: string } => {
   const usedByGoogleTags = [
     "title",
     "description",
@@ -56,7 +56,10 @@ export async function POST(request: Request) {
     const { url } = await request.json();
 
     if (!url || !url.startsWith("http")) {
-      return NextResponse.json({ error: "Please provide a valid URL starting with http or https." }, { status: 400 });
+      return NextResponse.json(
+        { error: "Please provide a valid URL starting with http or https." },
+        { status: 400 }
+      );
     }
 
     // Increment active users
@@ -65,7 +68,8 @@ export async function POST(request: Request) {
     // Fetch the webpage
     const response = await axios.get(url, {
       headers: {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
       },
     });
 
@@ -76,7 +80,7 @@ export async function POST(request: Request) {
     const metaTags: MetaTag[] = [];
     const titleTag = $("title").text();
     if (titleTag) {
-      const usage = determineUsage("title", titleTag);
+      const usage = determineUsage("title");
       metaTags.push({
         name: "title",
         content: titleTag,
@@ -86,10 +90,14 @@ export async function POST(request: Request) {
     }
 
     $("meta").each((_, element) => {
-      const name = $(element).attr("name") || $(element).attr("property") || $(element).attr("charset") || "unknown";
+      const name =
+        $(element).attr("name") ||
+        $(element).attr("property") ||
+        $(element).attr("charset") ||
+        "unknown";
       const content = $(element).attr("content") || $(element).attr("charset") || "";
       if (name && content) {
-        const usage = determineUsage(name, content);
+        const usage = determineUsage(name);
         metaTags.push({
           name,
           content,
@@ -108,6 +116,12 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error("Error extracting meta tags:", error);
     counters.activeUsers -= 1; // Ensure active users is decremented even on error
-    return NextResponse.json({ error: "Failed to extract meta tags. The website may not be accessible or has restricted access." }, { status: 500 });
+    return NextResponse.json(
+      {
+        error:
+          "Failed to extract meta tags. The website may not be accessible or has restricted access.",
+      },
+      { status: 500 }
+    );
   }
 }

@@ -1,19 +1,21 @@
-// app/api/generate-sitemap/route.js
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import fetch from "node-fetch";
 
-export async function POST(request) {
+export async function POST(request: NextRequest) {
   const { url } = await request.json();
 
   if (!url || !url.startsWith("http")) {
-    return NextResponse.json({ error: "Please provide a valid URL starting with http/https" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Please provide a valid URL starting with http/https" },
+      { status: 400 }
+    );
   }
 
-  const urls = new Set();
-  const visited = new Set();
+  const urls = new Set<string>();
+  const visited = new Set<string>();
   const baseUrl = new URL(url).origin;
 
-  async function crawl(pageUrl, depth = 0) {
+  async function crawl(pageUrl: string, depth = 0): Promise<void> {
     if (depth > 5 || visited.has(pageUrl) || !pageUrl.startsWith(baseUrl)) return;
 
     visited.add(pageUrl);
@@ -21,7 +23,8 @@ export async function POST(request) {
     try {
       const res = await fetch(pageUrl, {
         headers: { "User-Agent": "SitemapBot/1.0" },
-        timeout: 5000,
+        // Vercel compatibility: Use signal for timeout instead of fetch's timeout
+        signal: AbortSignal.timeout(5000),
       });
 
       if (!res.ok) return;
@@ -30,9 +33,9 @@ export async function POST(request) {
       urls.add(pageUrl);
 
       const links = html.match(/href=["'](.*?)["']/g) || [];
-      for (let link of links) {
+      for (const link of links) { // Changed 'let' to 'const'
         const href = link.replace(/href=["'](.*?)["']/, "$1");
-        let absoluteUrl;
+        let absoluteUrl: string;
 
         try {
           absoluteUrl = new URL(href, baseUrl).href;
@@ -52,7 +55,7 @@ export async function POST(request) {
         }
       }
     } catch (error) {
-      console.log(`Skipped ${pageUrl}: ${error.message}`);
+      console.log(`Skipped ${pageUrl}: ${(error as Error).message}`);
     }
   }
 
@@ -63,7 +66,8 @@ export async function POST(request) {
       return NextResponse.json({ error: "No valid URLs found" }, { status: 404 });
     }
     return NextResponse.json({ urls: urlArray });
-  } catch (error) {
+  } catch {
+    // Removed unused 'error' parameter
     return NextResponse.json({ error: "Server error while generating sitemap" }, { status: 500 });
   }
 }

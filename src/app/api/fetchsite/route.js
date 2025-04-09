@@ -1,26 +1,26 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req) {
+export async function POST(req: NextRequest) {
   const { domain } = await req.json();
 
   if (!domain || !domain.trim()) {
-    return NextResponse.json({ error: 'Domain is required' }, { status: 400 });
+    return NextResponse.json({ error: "Domain is required" }, { status: 400 });
   }
 
   try {
     // Try both HTTP and HTTPS
-    let url = `https://${domain.trim().replace(/^https?:\/\//, '')}`;
-    let response = await fetch(url, { 
-      headers: { 'User-Agent': 'Mozilla/5.0' },
-      redirect: 'follow' // Follow redirects
+    let url = `https://${domain.trim().replace(/^https?:\/\//, "")}`;
+    let response = await fetch(url, {
+      headers: { "User-Agent": "Mozilla/5.0" },
+      redirect: "follow", // Follow redirects
     });
 
     if (!response.ok) {
       // Fallback to HTTP if HTTPS fails
-      url = `http://${domain.trim().replace(/^https?:\/\//, '')}`;
-      response = await fetch(url, { 
-        headers: { 'User-Agent': 'Mozilla/5.0' },
-        redirect: 'follow'
+      url = `http://${domain.trim().replace(/^https?:\/\//, "")}`;
+      response = await fetch(url, {
+        headers: { "User-Agent": "Mozilla/5.0" },
+        redirect: "follow",
       });
     }
 
@@ -31,10 +31,12 @@ export async function POST(req) {
     const html = await response.text();
 
     const titleMatch = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i) || [];
-    const metaDescriptionMatch = html.match(/<meta[^>]*name=["']description["'][^>]*content=["']([^"']+)["']/i) || [];
+    const metaDescriptionMatch =
+      html.match(/<meta[^>]*name=["']description["'][^>]*content=["']([^"']+)["']/i) || [];
 
-    const metaTitle = (titleMatch[1] || '').trim() || `No title found for ${domain}`;
-    const metaDescription = (metaDescriptionMatch[1] || '').trim() || `No description found for ${domain}`;
+    const metaTitle = (titleMatch[1] || "").trim() || `No title found for ${domain}`;
+    const metaDescription =
+      (metaDescriptionMatch[1] || "").trim() || `No description found for ${domain}`;
     const date = new Date().toLocaleDateString(); // Use current date
 
     const faviconUrl = await getFaviconUrl(domain);
@@ -52,16 +54,19 @@ export async function POST(req) {
 
     return NextResponse.json(data);
   } catch (error) {
-    console.error('Fetch Error:', error);
-    return NextResponse.json({ 
-      error: `Failed to fetch site data: ${error.message}`, 
-      details: error.stack 
-    }, { status: 500 });
+    console.error("Fetch Error:", error);
+    return NextResponse.json(
+      {
+        error: `Failed to fetch site data: ${(error as Error).message}`,
+        details: (error as Error).stack,
+      },
+      { status: 500 }
+    );
   }
 }
 
-async function getFaviconUrl(domain) {
-  const baseUrl = `https://${domain.trim().replace(/^https?:\/\//, '')}`;
+async function getFaviconUrl(domain: string): Promise<string | null> {
+  const baseUrl = `https://${domain.trim().replace(/^https?:\/\//, "")}`;
   const faviconPaths = [
     `${baseUrl}/favicon.ico`,
     `${baseUrl}/favicon.png`,
@@ -71,13 +76,13 @@ async function getFaviconUrl(domain) {
 
   for (const url of faviconPaths) {
     try {
-      const response = await fetch(url, { 
-        method: 'HEAD',
-        redirect: 'follow'
+      const response = await fetch(url, {
+        method: "HEAD",
+        redirect: "follow",
       });
       if (response.ok) return url;
-    } catch (err) {
-      continue;
+    } catch {
+      continue; // Removed unused 'err' parameter
     }
   }
   return null;

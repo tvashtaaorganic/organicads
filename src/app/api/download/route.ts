@@ -5,7 +5,7 @@ import fs from "fs";
 import path from "path";
 import { Readable } from "stream";
 
-// Explicitly set FFmpeg path to the Chocolatey install location
+// Explicit FFmpeg path (Note: This won't work on Vercel; we'll address this below)
 const ffmpegPath = "C:\\ProgramData\\chocolatey\\bin\\ffmpeg.exe";
 if (fs.existsSync(ffmpegPath)) {
   ffmpeg.setFfmpegPath(ffmpegPath);
@@ -14,7 +14,7 @@ if (fs.existsSync(ffmpegPath)) {
   console.error(`FFmpeg not found at: ${ffmpegPath}. Please check the path.`);
 }
 
-// Path to store download stats
+// Stats file path
 const statsFilePath = path.join(process.cwd(), "download-stats.json");
 
 // Initialize stats if the file doesn't exist
@@ -25,7 +25,6 @@ if (!fs.existsSync(statsFilePath)) {
   );
 }
 
-// In-memory counter for live downloads
 let liveDownloads = 0;
 
 export async function GET(req: NextRequest) {
@@ -60,25 +59,25 @@ export async function GET(req: NextRequest) {
     });
 
     if (action === "info") {
-      const videoFormatsMap = new Map();
+      const videoFormatsMap = new Map<string, { itag: number; quality: string; fps: number; height: number; hasAudio: boolean }>();
       info.formats
         .filter((f) => f.qualityLabel && f.hasVideo)
         .forEach((f) => {
           const height = parseInt(f.qualityLabel) || 0;
           const fps = f.fps || 30;
           const key = `${height}-${fps}`;
-          if (!videoFormatsMap.has(key) || videoFormatsMap.get(key).itag < f.itag) {
+          if (!videoFormatsMap.has(key) || videoFormatsMap.get(key)!.itag < f.itag) {
             videoFormatsMap.set(key, {
               itag: f.itag,
               quality: f.qualityLabel,
-              fps: fps,
-              height: height,
+              fps,
+              height,
               hasAudio: f.hasAudio || false,
             });
           }
         });
 
-      let videoFormats = Array.from(videoFormatsMap.values()).sort((a, b) => b.height - a.height);
+      const videoFormats = Array.from(videoFormatsMap.values()).sort((a, b) => b.height - a.height); // Changed to const
 
       if (videoFormats.length === 0) {
         return NextResponse.json({ error: "No video formats available" }, { status: 500 });
@@ -86,7 +85,7 @@ export async function GET(req: NextRequest) {
 
       console.log("Available video formats (deduplicated):", videoFormats);
 
-      const audioFormatsMap = new Map();
+      const audioFormatsMap = new Map<number, { itag: number; quality: string }>();
       info.formats
         .filter((f) => f.audioBitrate && f.itag === 140)
         .forEach((f) => {
@@ -213,9 +212,9 @@ export async function GET(req: NextRequest) {
             console.log("FFmpeg merge completed successfully");
             resolve(null);
           })
-          .on("error", (err) => {
-            console.error("FFmpeg merge error:", err.message);
-            reject(err);
+          .on("error", (error: Error) => { // Changed 'err' to 'error' and used it
+            console.error("FFmpeg merge error:", error.message);
+            reject(error);
           })
           .run();
       });
@@ -228,7 +227,7 @@ export async function GET(req: NextRequest) {
         fs.unlinkSync(outputFilePath);
       });
 
-      stream.on("error", (err) => {
+      stream.on("error", () => { // Removed unused 'err' parameter
         if (fs.existsSync(videoFilePath)) fs.unlinkSync(videoFilePath);
         if (fs.existsSync(audioFilePath)) fs.unlinkSync(audioFilePath);
         if (fs.existsSync(outputFilePath)) fs.unlinkSync(outputFilePath);
@@ -254,7 +253,7 @@ export async function GET(req: NextRequest) {
       fs.writeFileSync(statsFilePath, JSON.stringify(updatedStats, null, 2));
     });
 
-    stream.on("error", (err) => {
+    stream.on("error", () => { // Removed unused 'err' parameter
       liveDownloads--;
       console.log(`Live downloads: ${liveDownloads}`);
       const updatedStats = JSON.parse(fs.readFileSync(statsFilePath, "utf-8"));
@@ -263,7 +262,7 @@ export async function GET(req: NextRequest) {
     });
 
     const encodedTitle = encodeURIComponent(title);
-    return new NextResponse(stream as any, {
+    return new NextResponse(stream as Readable, { // Specified type instead of 'any'
       headers: {
         "Content-Disposition": `attachment; filename*=UTF-8''${encodedTitle}.${format}`,
         "Content-Type": format === "mp3" ? "audio/mpeg" : "video/mp4",
@@ -278,7 +277,7 @@ export async function GET(req: NextRequest) {
 
     console.error("Download error:", error);
     return NextResponse.json(
-      { error: "Failed to download", details: error.message },
+      { error: "Failed to download", details: (error as Error).message },
       { status: 500 }
     );
   }
