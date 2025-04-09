@@ -9,7 +9,7 @@ import { Progress } from "@/components/ui/progress";
 import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
-import { Download, RefreshCcw, Search } from 'lucide-react';
+import { Download, RefreshCcw, Search } from "lucide-react";
 
 interface VideoInfo {
   title: string;
@@ -154,162 +154,147 @@ export default function YoutubeDownloader() {
     window.open(url, "_blank");
   };
 
-
   return (
     <div className="container mx-auto grid grid-cols-1 md:grid-cols-12 gap-6 mt-10 max-w-7xl px-4 sm:px-6 lg:px-8">
       {/* Left Section - Calculator */}
       <div className="md:col-span-8 bg-white p-6 rounded-lg shadow-md">
-      
         <h1 className="text-2xl font-bold mb-4 text-left">YouTube Downloader</h1>
-        
+
         <Card>
-      <CardContent className="space-y-4 p-4">
-        <div className="mb-4">
-          <Label htmlFor="url" className="mb-2">YouTube URL</Label>
-          <div className="flex gap-2 mb-4">
-            <Input
-              id="url"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              placeholder="Paste YouTube link here"
-              className="w-full"
-            />
-            <Button onClick={fetchVideoInfo} disabled={loading || !url}>
-            <Search /> Search
-            </Button>
-          </div>
-        </div>
-
-        {videoInfo && (
-          <>
-            <div className="flex gap-4">
-              <div className="relative w-[120px] h-[90px] flex-shrink-0 mb-4 mt-4">
-                <Image src={videoInfo.thumbnail} alt="Thumbnail" fill className="rounded" style={{ objectFit: "cover" }} />
-              </div>
-              <div className="flex-1 mb-4 mt-4">
-                <p className="font-semibold text-sm">{videoInfo.title}</p>
-                <p className="text-xs text-gray-500">
-                  Duration: {Math.floor(parseInt(videoInfo.duration) / 60)}:{(parseInt(videoInfo.duration) % 60).toString().padStart(2, "0")}
-                </p>
+          <CardContent className="space-y-4 p-4">
+            <div className="mb-4">
+              <Label htmlFor="url" className="mb-2">YouTube URL</Label>
+              <div className="flex gap-2 mb-4">
+                <Input
+                  id="url"
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                  placeholder="Paste YouTube link here"
+                  className="w-full"
+                />
+                <Button onClick={fetchVideoInfo} disabled={loading || !url}>
+                  <Search /> Search
+                </Button>
               </div>
             </div>
 
-            <div className="grid-cols-2 md:grid-cols-2 gap-3 mb-4 flex flex-wrap justify-center md:justify-start">
-            <div>
-              <Label className="mb-2">Format</Label>
-              <Select value={format} onValueChange={setFormat}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select format" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="mp4">MP4 (Video)</SelectItem>
-                  <SelectItem value="mp3">MP3 (Audio)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            {videoInfo && (
+              <>
+                <div className="flex gap-4">
+                  <div className="relative w-[120px] h-[90px] flex-shrink-0 mb-4 mt-4">
+                    <Image
+                      src={videoInfo.thumbnail}
+                      alt="Thumbnail"
+                      fill
+                      className="rounded"
+                      style={{ objectFit: "cover" }}
+                    />
+                  </div>
+                  <div className="flex-1 mb-4 mt-4">
+                    <p className="font-semibold text-sm">{videoInfo.title}</p>
+                    <p className="text-xs text-gray-500">
+                      Duration: {Math.floor(parseInt(videoInfo.duration) / 60)}:
+                      {(parseInt(videoInfo.duration) % 60).toString().padStart(2, "0")}
+                    </p>
+                  </div>
+                </div>
 
-            <div>
-              <Label className="mb-2">Quality</Label>
-              <Select value={quality} onValueChange={setQuality}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select quality" />
-                </SelectTrigger>
-                <SelectContent>
-                  {format === "mp4" && videoInfo.videoFormats.length > 0 ? (
-                    videoInfo.videoFormats.map((f) => (
-                      <SelectItem key={f.itag} value={f.itag.toString()}>
-                        {f.quality} ({f.fps}FPS)
-                      </SelectItem>
-                    ))
-                  ) : (
-                    videoInfo.audioFormats.map((f) => (
-                      <SelectItem key={f.itag} value={f.itag.toString()}>
-                        {f.quality}
-                      </SelectItem>
-                    ))
-                  )}
-                </SelectContent>
-              </Select>
-            </div>
-            </div>
+                <div className="grid-cols-2 md:grid-cols-2 gap-3 mb-4 flex flex-wrap justify-center md:justify-start">
+                  <div>
+                    <Label className="mb-2">Format</Label>
+                    <Select value={format} onValueChange={setFormat}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select format" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="mp4">MP4 (Video)</SelectItem>
+                        <SelectItem value="mp3">MP3 (Audio)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-            {loading && (
-              <div>
-                <Progress value={progress} className="w-full" />
-                <p className="text-sm text-center mt-1">{progress}%</p>
-              </div>
+                  <div>
+                    <Label className="mb-2">Quality</Label>
+                    <Select value={quality} onValueChange={setQuality}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select quality" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {format === "mp4" && videoInfo.videoFormats.length > 0 ? (
+                          videoInfo.videoFormats.map((f) => (
+                            <SelectItem key={f.itag} value={f.itag.toString()}>
+                              {f.quality} ({f.fps}FPS)
+                            </SelectItem>
+                          ))
+                        ) : (
+                          videoInfo.audioFormats.map((f) => (
+                            <SelectItem key={f.itag} value={f.itag.toString()}>
+                              {f.quality}
+                            </SelectItem>
+                          ))
+                        )}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                {loading && (
+                  <div>
+                    <Progress value={progress} className="w-full" />
+                    <p className="text-sm text-center mt-1">{progress}%</p>
+                  </div>
+                )}
+
+                {error && <p className="text-red-500 text-sm">{error}</p>}
+
+                <div className="space-y-2 flex flex-wrap justify-end gap-2 mb-4">
+                  <Button onClick={handleDownload} disabled={loading || !url || !videoInfo}>
+                    <Download /> {loading ? "Downloading..." : "Download"}
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setUrl("");
+                      setVideoInfo(null);
+                      setFormat("mp4");
+                      setQuality("");
+                      setError("");
+                    }}
+                    variant="destructive"
+                  >
+                    <RefreshCcw /> Reset
+                  </Button>
+                </div>
+              </>
             )}
 
-            {error && <p className="text-red-500 text-sm">{error}</p>}
-
-            <div className="space-y-2 flex flex-wrap justify-end gap-2 mb-4">
-              <Button onClick={handleDownload} disabled={loading || !url || !videoInfo} >
-              <Download /> {loading ? "Downloading..." : "Download"}
-              </Button>
-              <Button
-                onClick={() => {
-                  setUrl("");
-                  setVideoInfo(null);
-                  setFormat("mp4");
-                  setQuality("");
-                  setError("");
-                }}
-                variant="destructive"
-               
-              >
-                <RefreshCcw /> Reset
-              </Button>
+            <div className="mt-6 bg-gray-50 rounded-md p-6 shadow-sm">
+              <h2 className="text-lg font-semibold mb-2">Download Statistics</h2>
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <p className="text-sm text-muted-foreground font-medium">Live Downloads</p>
+                  <span className="text-black text-2xl font-bold"> {stats.liveDownloads}</span>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground font-medium">Total Video Downloads</p>
+                  <p className="text-black text-2xl font-bold"> {stats.totalVideoDownloads}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground font-medium">Total Audio Downloads</p>
+                  <p className="text-black text-2xl font-bold"> {stats.totalAudioDownloads}</p>
+                </div>
+              </div>
             </div>
-          </>
-        )}
-
-        {/* Download Stats Card 
-        <div className="mt-6 p-4 bg-gray-50 rounded-lg shadow-sm">
-          <h2 className="text-lg font-semibold mb-2">Download Statistics</h2>
-          <p className="text-sm mb-2">
-            <strong>Live Downloads:</strong> {stats.liveDownloads}
-          </p>
-          <p className="text-sm mb-2">
-            <strong>Total Video Downloads:</strong> {stats.totalVideoDownloads}
-          </p>
-          <p className="text-sm mb-2">
-            <strong>Total Audio Downloads:</strong> {stats.totalAudioDownloads}
-          </p>
-        </div>
-        */}
-        
-        <div className="mt-6 bg-gray-50 rounded-md p-6 shadow-sm">
-        <h2 className="text-lg font-semibold mb-2">Download Statistics</h2>
-          <div className="grid grid-cols-3 gap-4">
-          <div>
-            <p className="text-sm text-muted-foreground font-medium">Live Downloads</p>
-            <span className="text-black text-2xl font-bold"> {stats.liveDownloads}</span>
-          </div>
-            <div>
-              <p className="text-sm text-muted-foreground font-medium">Total Video Downloads</p>
-              <p className="text-black text-2xl font-bold">  {stats.totalVideoDownloads}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground font-medium">Total Audio Downloads</p>
-              <p className="text-black text-2xl font-bold">  {stats.totalAudioDownloads}</p>
-            </div>
-          </div>
-        </div>
-
-
-
-      </CardContent>
-    </Card>
-     
+          </CardContent>
+        </Card>
 
         {/* Share on WhatsApp Button */}
         <div className="flex justify-center items-center mt-6 mb-4">
-                        <button
-                            onClick={shareOnWhatsApp}
-                            className="inline-flex items-center justify-center rounded-md text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 bg-[#25D366] hover:bg-[#128C7E] text-white font-medium px-6 py-2"
-                        >
-                            Share on WhatsApp
-                        </button>
+          <button
+            onClick={shareOnWhatsApp}
+            className="inline-flex items-center justify-center rounded-md text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 bg-[#25D366] hover:bg-[#128C7E] text-white font-medium px-6 py-2"
+          >
+            Share on WhatsApp
+          </button>
         </div>
 
         <div className="mt-12 prose max-w-none opacity-100">
@@ -368,11 +353,10 @@ export default function YoutubeDownloader() {
             </p>
           </div>
         </div>
-      
-        </div>
+      </div>
 
-    {/* Right Section - Quick Tips */}
-    <div className="md:col-span-4 bg-white p-6 rounded-lg shadow-md space-y-6">
+      {/* Right Section - Quick Tips */}
+      <div className="md:col-span-4 bg-white p-6 rounded-lg shadow-md space-y-6">
         <div className="bg-blue-100 rounded-lg p-4">
           <h3 className="font-medium text-lg mb-2">Quick Tips</h3>
           <ul className="text-sm space-y-2">
@@ -485,9 +469,7 @@ export default function YoutubeDownloader() {
             </button>
           </Link>
         </div>
+      </div>
     </div>
-
-    </div>
-    
   );
 }

@@ -10,7 +10,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { Copy, Sparkle, RefreshCcw  } from "lucide-react";
 
-
 // File reader utility
 const readFileContent = (file) => {
   return new Promise((resolve, reject) => {
@@ -45,7 +44,7 @@ export default function LSIKeywordSuggestion() {
           setUploadedKeywords(keywords)
         }
         setSuggestedKeywords([]) // Reset suggestions on new upload
-      } catch (error) {
+      } catch {
         alert('Error reading file. Please upload a valid text file.')
       }
     }
@@ -243,7 +242,7 @@ export default function LSIKeywordSuggestion() {
               <li>Use Reset to start a new calculation.</li>
             </ol>
             <p>
-              The calculator automatically handles date order, so you don't need
+              The calculator automatically handles date order, so you don&apos;t need
               to worry about which date comes first. It provides comprehensive
               results including total days, weeks, working days, and weekends,
               making it useful for both personal and professional use.

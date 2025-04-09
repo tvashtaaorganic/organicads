@@ -50,7 +50,7 @@ export default function RobotsGenerator() {
         setAnalytics((prev) => ({ ...prev, live: Math.max(0, prev.live - 1) }));
       }
     };
-  }, []);
+  }, [loading]);
 
   useEffect(() => {
     if (analytics.totalGenerated > 0 || analytics.totalUsers > 0) {
@@ -164,7 +164,7 @@ export default function RobotsGenerator() {
         totalGenerated: prev.totalGenerated + 1,
         totalUsers: prev.totalUsers + 1,
       }));
-    } catch (error) {
+    } catch {
       setResult("Error: Could not generate robots.txt");
       setProgress(0);
       setAnalytics((prev) => ({ ...prev, live: Math.max(0, prev.live - 1) }));

@@ -1,4 +1,3 @@
-import Image from "next/image";
 import NavbarMenu from "./comp/navbar";
 import HeroContent from "./herocont/page";
 import Footer from "./comp/footer/page";

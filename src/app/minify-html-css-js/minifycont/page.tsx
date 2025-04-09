@@ -2,10 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea"
-
 import {
   Dialog,
   DialogContent,
@@ -26,7 +24,6 @@ export default function MinifierAll() {
     totalUsers: 0,
     totalBytesSaved: 0,
   });
-  const [isMinifying, setIsMinifying] = useState(false); // Track minification state
 
   // Load stats from localStorage on mount
   useEffect(() => {
@@ -55,7 +52,6 @@ export default function MinifierAll() {
       ...prev,
       liveUsers: Math.max(0, prev.liveUsers + 1),
     }));
-    setIsMinifying(true);
 
     const minify = (code) =>
       code
@@ -97,7 +93,6 @@ export default function MinifierAll() {
         ...prev,
         liveUsers: Math.max(0, prev.liveUsers - 1),
       }));
-      setIsMinifying(false);
     }, 2000); // 2 seconds timeout
   };
 

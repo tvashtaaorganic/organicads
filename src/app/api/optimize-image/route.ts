@@ -1,9 +1,10 @@
-import { NextResponse } from "next/server";
+// ./src/app/api/optimize-image/route.ts
+import { NextRequest, NextResponse } from "next/server";
 import sharp from "sharp";
 
 // In-memory stats (reset on server restart)
 let stats = {
-  users: new Set(), // Use Set to track unique users based on timestamp
+  users: new Set<number>(), // Explicitly type as Set<number> for timestamps
   imagesConverted: 0,
   totalSizeReduced: 0,
 };
@@ -22,7 +23,7 @@ const updateUniqueUsers = () => {
   }
 };
 
-export async function POST(req) {
+export async function POST(req: NextRequest) {
   try {
     console.log("Received POST request for image optimization");
     console.log("Request headers:", req.headers);
@@ -45,8 +46,8 @@ export async function POST(req) {
     stats.users.add(now); // Add current timestamp as a unique "user" on optimization
     stats.imagesConverted += 1;
 
-    const compressionType = formData.get("compressionType") || "lossy";
-    const reductionPercent = parseInt(formData.get("reductionPercent")) || 0; // e.g., 20, 30, 50
+    const compressionType = (formData.get("compressionType") as string) || "lossy";
+    const reductionPercent = parseInt(formData.get("reductionPercent") as string) || 0; // e.g., 20, 30, 50
     console.log("Compression type:", compressionType, "Reduction percent:", reductionPercent);
 
     // Convert file to buffer (in-memory processing)
@@ -55,7 +56,7 @@ export async function POST(req) {
     const originalSize = originalBuffer.length;
 
     // Compress the image based on reduction percentage
-    let compressedBuffer;
+    let compressedBuffer: Buffer | undefined;
     let targetSize = originalSize * (1 - reductionPercent / 100);
     let quality = 80; // Start with reasonable quality
     let attempt = 0;
@@ -68,11 +69,11 @@ export async function POST(req) {
           .toBuffer();
       } else if (compressionType === "lossless") {
         compressedBuffer = await sharp(originalBuffer)
-          .toFormat(file.type.split("/")[1], { effort: 6, optimiseCoding: true })
+          .toFormat(file.type.split("/")[1] as keyof sharp.FormatEnum, { effort: 6, optimiseCoding: true })
           .toBuffer();
       } else if (compressionType === "custom") {
         compressedBuffer = await sharp(originalBuffer)
-          .resize({ width: Math.round((await sharp(originalBuffer).metadata()).width * (1 - reductionPercent / 100)) })
+          .resize({ width: Math.round((await sharp(originalBuffer).metadata()).width! * (1 - reductionPercent / 100)) })
           .jpeg({ quality: 70, optimiseScans: true })
           .toBuffer();
       }
@@ -94,7 +95,7 @@ export async function POST(req) {
 
     const compressedSize = compressedBuffer.length;
     const sizeReduced = originalSize - compressedSize;
-    const savings = ((sizeReduced) / originalSize) * 100;
+    const savings = (sizeReduced / originalSize) * 100;
 
     stats.totalSizeReduced += sizeReduced; // Accumulate total size reduced
 
@@ -108,7 +109,7 @@ export async function POST(req) {
       downloadUrl: downloadUrl,
       status: "success",
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error in image optimization:", error.message, error.stack);
     return NextResponse.json(
       { error: error.message || "An error occurred while optimizing the image." },
@@ -117,7 +118,7 @@ export async function POST(req) {
   }
 }
 
-export async function GET(req) {
+export async function GET() { // Removed unused 'req'
   try {
     updateUniqueUsers();
     return NextResponse.json({
@@ -127,7 +128,7 @@ export async function GET(req) {
         totalSizeReduced: stats.totalSizeReduced,
       },
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error fetching stats:", error.message, error.stack);
     return NextResponse.json(
       { error: "Failed to fetch stats." },

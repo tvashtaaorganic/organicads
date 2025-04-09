@@ -1,9 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
   Popover,
   PopoverContent,
@@ -17,15 +16,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, RefreshCcw } from "lucide-react";
 import { format } from "date-fns";
 import Image from "next/image";
 import Link from "next/link";
-import { RefreshCcw } from 'lucide-react';
 
 export default function DateDifferenceCalculator() {
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
   const [startTime, setStartTime] = useState("12:00 AM");
   const [endTime, setEndTime] = useState("12:00 AM");
   const [duration, setDuration] = useState("");
@@ -40,11 +38,11 @@ export default function DateDifferenceCalculator() {
     return `${hour}:${i % 2 === 0 ? "00" : "30"} ${period}`;
   });
 
-  const parseTime = (timeStr) => {
+  const parseTime = (timeStr: string) => {
     const [time, period] = timeStr.split(" ");
-    let [hours, minutes] = time.split(":").map(Number);
-    if (period === "PM" && hours !== 12) hours += 12;
-    if (period === "AM" && hours === 12) hours = 0;
+    const [hours, minutes] = time.split(":").map(Number);
+    if (period === "PM" && hours !== 12) return { hours: hours + 12, minutes };
+    if (period === "AM" && hours === 12) return { hours: 0, minutes };
     return { hours, minutes };
   };
 
@@ -116,7 +114,7 @@ export default function DateDifferenceCalculator() {
   };
 
   const shareOnWhatsApp = () => {
-    const message = `Check out this awesome Loan EMI Calculator:\n\nhttps://yourwebsite.com/loan-emi-calculator`;
+    const message = `Check out this awesome Date Difference Calculator:\n\nhttps://yourwebsite.com/date-difference-calculator`;
     const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
     window.open(url, "_blank");
   };
@@ -127,158 +125,157 @@ export default function DateDifferenceCalculator() {
       <div className="md:col-span-8 bg-white p-6 rounded-lg shadow-md">
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl font-bold text-balck">
+            <CardTitle className="text-2xl font-bold text-black">
               Date Difference Calculator
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-6">
-            <div className="bg-white p-6 rounded-lg border">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Start Date */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">
-                    Start Date
-                  </label>
-                  <div className="flex flex-col gap-2">
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className="w-full justify-start text-left font-normal"
-                        >
-                          <CalendarIcon className="mr-2 h-4 w-4" />
-                          {startDate
-                            ? format(startDate, "dd-MM-yyyy")
-                            : "Select date"}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0">
-                        <Calendar
-                          mode="single"
-                          selected={startDate}
-                          onSelect={setStartDate}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                    <Select value={startTime} onValueChange={setStartTime}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select time" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {timeOptions.map((time) => (
-                          <SelectItem key={time} value={time}>
-                            {time}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+              <div className="bg-white p-6 rounded-lg border">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Start Date */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                      Start Date
+                    </label>
+                    <div className="flex flex-col gap-2">
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className="w-full justify-start text-left font-normal"
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {startDate
+                              ? format(startDate, "dd-MM-yyyy")
+                              : "Select date"}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0">
+                          <Calendar
+                            mode="single"
+                            selected={startDate ?? undefined}
+                            onSelect={(date) => setStartDate(date ?? null)}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <Select value={startTime} onValueChange={setStartTime}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select time" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {timeOptions.map((time) => (
+                            <SelectItem key={time} value={time}>
+                              {time}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  {/* End Date */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                      End Date
+                    </label>
+                    <div className="flex flex-col gap-2">
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className="w-full justify-start text-left font-normal"
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {endDate
+                              ? format(endDate, "dd-MM-yyyy")
+                              : "Select date"}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0">
+                          <Calendar
+                            mode="single"
+                            selected={endDate ?? undefined}
+                            onSelect={(date) => setEndDate(date ?? null)}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <Select value={endTime} onValueChange={setEndTime}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select time" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {timeOptions.map((time) => (
+                            <SelectItem key={time} value={time}>
+                              {time}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                 </div>
 
-                {/* End Date */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">
-                    End Date
-                  </label>
-                  <div className="flex flex-col gap-2">
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className="w-full justify-start text-left font-normal"
-                        >
-                          <CalendarIcon className="mr-2 h-4 w-4" />
-                          {endDate
-                            ? format(endDate, "dd-MM-yyyy")
-                            : "Select date"}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0">
-                        <Calendar
-                          mode="single"
-                          selected={endDate}
-                          onSelect={setEndDate}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                    <Select value={endTime} onValueChange={setEndTime}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select time" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {timeOptions.map((time) => (
-                          <SelectItem key={time} value={time}>
-                            {time}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                {/* Buttons */}
+                <div className="flex justify-end gap-4 mt-6">
+                  <Button onClick={resetFields} variant="outline">
+                    <RefreshCcw /> Reset
+                  </Button>
+                  <Button
+                    onClick={calculateDifference}
+                    className="bg-blue-600 text-white"
+                  >
+                    Calculate Difference
+                  </Button>
                 </div>
               </div>
-
-              {/* Buttons */}
-              <div className="flex justify-end gap-4 mt-6">
-                <Button onClick={resetFields} variant="outline">
-                <RefreshCcw /> Reset
-                </Button>
-                <Button
-                  onClick={calculateDifference}
-                  className="bg-blue-600 text-white"
-                >
-                  Calculate Difference
-                </Button>
-              </div>
-            </div>
-
 
               {/* Results */}
               {duration && (
                 <div className="space-y-6">
-                <div className="bg-white p-6 rounded-lg border">
-                  <div>
-                    <h3 className="text-lg font-semibold text-blue-600">
-                      Duration
-                    </h3>
-                    <p>{duration}</p>
-                  </div>
-                </div>
-
-                  <div className="grid grid-cols-2 gap-4">
                   <div className="bg-white p-6 rounded-lg border">
                     <div>
-                      <h4 className="text-sm font-medium text-blue-600">
-                        Total Days
-                      </h4>
-                      <p>{totalDays}</p>
+                      <h3 className="text-lg font-semibold text-blue-600">
+                        Duration
+                      </h3>
+                      <p>{duration}</p>
                     </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-white p-6 rounded-lg border">
+                      <div>
+                        <h4 className="text-sm font-medium text-blue-600">
+                          Total Days
+                        </h4>
+                        <p>{totalDays}</p>
+                      </div>
                     </div>
                     <div className="bg-white p-6 rounded-lg border">
-                    <div>
-                      <h4 className="text-sm font-medium text-blue-600">
-                        Weeks
-                      </h4>
-                      <p>{weeks}</p>
-                    </div>
-                    </div>
-                    <div className="bg-white p-6 rounded-lg border">
-                    <div>
-                      <h4 className="text-sm font-medium text-blue-600">
-                        Working Days
-                      </h4>
-                      <p>{workingDays}</p>
-                    </div>
+                      <div>
+                        <h4 className="text-sm font-medium text-blue-600">
+                          Weeks
+                        </h4>
+                        <p>{weeks}</p>
+                      </div>
                     </div>
                     <div className="bg-white p-6 rounded-lg border">
-                    <div>
-                      <h4 className="text-sm font-medium text-blue-600">
-                        Weekends
-                      </h4>
-                      <p>{weekends}</p>
+                      <div>
+                        <h4 className="text-sm font-medium text-blue-600">
+                          Working Days
+                        </h4>
+                        <p>{workingDays}</p>
+                      </div>
                     </div>
+                    <div className="bg-white p-6 rounded-lg border">
+                      <div>
+                        <h4 className="text-sm font-medium text-blue-600">
+                          Weekends
+                        </h4>
+                        <p>{weekends}</p>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -342,11 +339,11 @@ export default function DateDifferenceCalculator() {
               <li>Add start time (optional) for more precision.</li>
               <li>Enter the end date.</li>
               <li>Add end time (optional).</li>
-              <li>Click "Calculate Difference" to see results.</li>
+              <li>Click &quot;Calculate Difference&quot; to see results.</li>
               <li>Use Reset to start a new calculation.</li>
             </ol>
             <p>
-              The calculator automatically handles date order, so you don't need
+              The calculator automatically handles date order, so you don&apos;t need
               to worry about which date comes first. It provides comprehensive
               results including total days, weeks, working days, and weekends,
               making it useful for both personal and professional use.
@@ -388,7 +385,7 @@ export default function DateDifferenceCalculator() {
           <div className="flex items-center gap-1 mb-2">
             <div className="flex text-yellow-400">
               {Array(5)
-                .fill()
+                .fill(0)
                 .map((_, i) => (
                   <svg
                     key={i}
@@ -421,7 +418,7 @@ export default function DateDifferenceCalculator() {
                   <div className="text-lg font-semibold">Excellent</div>
                   <div className="flex text-[#00b67a]">
                     {Array(5)
-                      .fill()
+                      .fill(0)
                       .map((_, i) => (
                         <svg
                           key={i}
@@ -455,7 +452,7 @@ export default function DateDifferenceCalculator() {
 
           <p className="text-sm mb-4">
             🎯 We build your business into a Brand. 🌐 Helping Businesses
-            Increase Leads, Traffic & Sales!. 🚀 Google, Bing Rank Your Web Page
+            Increase Leads, Traffic &amp; Sales!. 🚀 Google, Bing Rank Your Web Page
             in Just 4 Hours!. 🚀 Web Design | Digital Marketing | SEO, SEM, SMM
             | Google, Meta Ads | Branding
           </p>

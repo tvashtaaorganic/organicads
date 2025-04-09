@@ -15,7 +15,6 @@ import { Label } from "@/components/ui/label"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Copy, RefreshCcw, FileJson2 } from 'lucide-react';
 
-
 // Define baseFields at the top
 const baseFields = {
   Event: [
@@ -159,7 +158,7 @@ export default function SchemaGenerator() {
   }
 
   const removeSocialProfile = (index: number) => {
-    const updatedProfiles = (schemaData.socialProfiles || []).filter((_, i) => i !== index)
+    const updatedProfiles = (schemaData.socialProfiles || []).filter((i) => i !== index)
     setSchemaData(prev => ({
       ...prev,
       socialProfiles: updatedProfiles.length ? updatedProfiles : [{ url: '' }]

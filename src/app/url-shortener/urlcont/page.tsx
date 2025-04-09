@@ -9,12 +9,10 @@ import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
 import qrcode from "qrcode-generator";
-import html2canvas from "html2canvas";
 import { nanoid } from "nanoid";
 import Image from "next/image";
 import Link from "next/link";
-import { Link2 } from 'lucide-react';
-
+import { Link2 } from "lucide-react";
 
 export default function URLShortenerPage() {
   const [longUrl, setLongUrl] = useState("");
@@ -27,7 +25,7 @@ export default function URLShortenerPage() {
   const [shortenedLinks, setShortenedLinks] = useState([]);
   const [analytics, setAnalytics] = useState({});
   const [bulkUrls, setBulkUrls] = useState([]);
-  const [isPremium, setIsPremium] = useState(false); // Simulate premium access
+  const [isPremium] = useState(false); // Simulate premium access, no setter needed
   const qrCodeRef = useRef(null);
 
   // Load data from localStorage on mount
@@ -43,7 +41,6 @@ export default function URLShortenerPage() {
     localStorage.setItem("shortenedLinks", JSON.stringify(shortenedLinks));
     localStorage.setItem("analytics", JSON.stringify(analytics));
   }, [shortenedLinks, analytics]);
-
 
   // Generate QR Code
   useEffect(() => {
@@ -249,311 +246,310 @@ export default function URLShortenerPage() {
     window.open(url, "_blank");
   };
 
-
   return (
     <div className="container mx-auto grid grid-cols-1 md:grid-cols-12 gap-6 mt-10 max-w-7xl px-4 sm:px-6 lg:px-8">
-    {/* Left Section - Calculator */}
-    <div className="md:col-span-8 bg-white p-6 rounded-lg shadow-md">
-      <div className="max-w-4xl mx-auto">
-        {/* Dark Mode Toggle */}
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">URL Shortener</h1>
-        </div>
+      {/* Left Section - Calculator */}
+      <div className="md:col-span-8 bg-white p-6 rounded-lg shadow-md">
+        <div className="max-w-4xl mx-auto">
+          {/* Dark Mode Toggle */}
+          <div className="flex justify-between items-center mb-4">
+            <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">URL Shortener</h1>
+          </div>
 
-        {/* URL Shortener Form */}
-        <Card className="dark:bg-gray-800 dark:text-gray-100 mb-6">
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold">Shorten a URL</CardTitle>
-          </CardHeader>
-          <CardContent>
-        <div className="bg-white p-4 rounded-lg border mb-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <div>
-                <Label htmlFor="long-url" className="mb-2">Long URL</Label>
-                <Input
-                  id="long-url"
-                  type="text"
-                  value={longUrl}
-                  onChange={(e) => setLongUrl(e.target.value)}
-                  placeholder="https://example.com/very/long/url"
-                />
-              </div>
-              <div>
-                <Label htmlFor="custom-slug" className="mb-2">Custom Slug (Optional)</Label>
-                <Input
-                  id="custom-slug"
-                  type="text"
-                  value={customSlug}
-                  onChange={(e) => setCustomSlug(e.target.value)}
-                  placeholder="e.g., sale2025"
-                />
-              </div>
-            </div>
+          {/* URL Shortener Form */}
+          <Card className="dark:bg-gray-800 dark:text-gray-100 mb-6">
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold">Shorten a URL</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="bg-white p-4 rounded-lg border mb-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <Label htmlFor="long-url" className="mb-2">Long URL</Label>
+                    <Input
+                      id="long-url"
+                      type="text"
+                      value={longUrl}
+                      onChange={(e) => setLongUrl(e.target.value)}
+                      placeholder="https://example.com/very/long/url"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="custom-slug" className="mb-2">Custom Slug (Optional)</Label>
+                    <Input
+                      id="custom-slug"
+                      type="text"
+                      value={customSlug}
+                      onChange={(e) => setCustomSlug(e.target.value)}
+                      placeholder="e.g., sale2025"
+                    />
+                  </div>
+                </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <div>
-                <Label htmlFor="domain" className="mb-2">Domain</Label>
-                <Select value={domain} onValueChange={setDomain}>
-                  <SelectTrigger id="domain">
-                    <SelectValue placeholder="Select Domain" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="xyz.ly">xyz.ly</SelectItem>
-                    <SelectItem value="short.link">short.link</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="custom-domain" className="mb-2">Custom Domain (Optional)</Label>
-                <Input
-                  id="custom-domain"
-                  type="text"
-                  value={customDomain}
-                  onChange={(e) => setCustomDomain(e.target.value)}
-                  placeholder="e.g., mystore.in"
-                />
-              </div>
-            </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <Label htmlFor="domain" className="mb-2">Domain</Label>
+                    <Select value={domain} onValueChange={setDomain}>
+                      <SelectTrigger id="domain">
+                        <SelectValue placeholder="Select Domain" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="xyz.ly">xyz.ly</SelectItem>
+                        <SelectItem value="short.link">short.link</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="custom-domain" className="mb-2">Custom Domain (Optional)</Label>
+                    <Input
+                      id="custom-domain"
+                      type="text"
+                      value={customDomain}
+                      onChange={(e) => setCustomDomain(e.target.value)}
+                      placeholder="e.g., mystore.in"
+                    />
+                  </div>
+                </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <div>
-                <Label htmlFor="expiration-type" className="mb-2">Expiration Type</Label>
-                <Select value={expirationType} onValueChange={setExpirationType}>
-                  <SelectTrigger id="expiration-type">
-                    <SelectValue placeholder="Select Expiration Type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">None</SelectItem>
-                    <SelectItem value="date">Expiration Date</SelectItem>
-                    <SelectItem value="clicks">Click Limit</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              {expirationType !== "none" && (
-                <div>
-                  <Label htmlFor="expiration-value" className="mb-2">
-                    {expirationType === "date" ? "Expiration Date" : "Click Limit"}
-                  </Label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <Label htmlFor="expiration-type" className="mb-2">Expiration Type</Label>
+                    <Select value={expirationType} onValueChange={setExpirationType}>
+                      <SelectTrigger id="expiration-type">
+                        <SelectValue placeholder="Select Expiration Type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">None</SelectItem>
+                        <SelectItem value="date">Expiration Date</SelectItem>
+                        <SelectItem value="clicks">Click Limit</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  {expirationType !== "none" && (
+                    <div>
+                      <Label htmlFor="expiration-value" className="mb-2">
+                        {expirationType === "date" ? "Expiration Date" : "Click Limit"}
+                      </Label>
+                      <Input
+                        id="expiration-value"
+                        type={expirationType === "date" ? "date" : "number"}
+                        value={expirationValue}
+                        onChange={(e) => setExpirationValue(e.target.value)}
+                        placeholder={expirationType === "date" ? "Select date" : "Enter click limit"}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                <div className="mb-6">
+                  <Label htmlFor="password" className="mb-2">Password (Optional)</Label>
                   <Input
-                    id="expiration-value"
-                    type={expirationType === "date" ? "date" : "number"}
-                    value={expirationValue}
-                    onChange={(e) => setExpirationValue(e.target.value)}
-                    placeholder={expirationType === "date" ? "Select date" : "Enter click limit"}
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Set a password for this link"
                   />
                 </div>
-              )}
-            </div>
 
-            <div className="mb-6">
-              <Label htmlFor="password" className="mb-2">Password (Optional)</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Set a password for this link"
-              />
-            </div>
-       
-            <Button onClick={shortenUrl} className="bg-blue-600 text-white">
-            <Link2 /> Shorten URL
-            </Button>
+                <Button onClick={shortenUrl} className="bg-blue-600 text-white">
+                  <Link2 /> Shorten URL
+                </Button>
+              </div>
+
+              {shortenedLinks.length > 0 && (
+                <div className="bg-white p-4 rounded-lg border mb-4">
+                  <div className="mt-4">
+                    <h3 className="text-lg font-semibold mb-2">Latest Shortened URL</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Short URL:{" "}
+                      <a
+                        href="#"
+                        onClick={() => trackClick(shortenedLinks[shortenedLinks.length - 1].id)}
+                        className="text-blue-600"
+                      >
+                        {shortenedLinks[shortenedLinks.length - 1].shortUrl}
+                      </a>
+                    </p>
+                    <div className="flex justify-center mt-2" ref={qrCodeRef}></div>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Custom Domain Guide */}
+          <Card className="dark:bg-gray-800 dark:text-gray-100 mb-6">
+            <CardHeader>
+              <CardTitle>Custom Domain Setup Guide</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                To use a custom domain (e.g., mystore.in), follow these steps:
+              </p>
+              <ol className="list-decimal list-inside mt-2 text-sm text-gray-600 dark:text-gray-400">
+                <li>Add a CNAME record in your DNS settings pointing to our server (e.g., cname.xyz.ly).</li>
+                <li>Enter your custom domain in the field above.</li>
+                <li>Wait for DNS propagation (up to 48 hours).</li>
+                <li>Start creating branded short links!</li>
+              </ol>
+            </CardContent>
+          </Card>
+
+          {/* Shortened Links Table */}
+          {shortenedLinks.length > 0 && (
+            <Card className="dark:bg-gray-800 dark:text-gray-100 mb-6">
+              <CardHeader>
+                <CardTitle>Shortened Links</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Short URL</TableHead>
+                      <TableHead>Long URL</TableHead>
+                      <TableHead>Clicks</TableHead>
+                      <TableHead>Created At</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {shortenedLinks.map((link) => (
+                      <TableRow key={link.id}>
+                        <TableCell>
+                          <a
+                            href="#"
+                            onClick={() => trackClick(link.id)}
+                            className="text-blue-600"
+                          >
+                            {link.shortUrl}
+                          </a>
+                        </TableCell>
+                        <TableCell>{link.longUrl}</TableCell>
+                        <TableCell>{analytics[link.id]?.clicks || 0}</TableCell>
+                        <TableCell>{new Date(link.createdAt).toLocaleDateString()}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Analytics Dashboard */}
+          {shortenedLinks.length > 0 && (
+            <Card className="dark:bg-gray-800 dark:text-gray-100 mb-6">
+              <CardHeader>
+                <CardTitle>Analytics Dashboard</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {shortenedLinks.map((link) => (
+                  <div key={link.id} className="mb-6">
+                    <h3 className="text-lg font-semibold mb-2">{link.shortUrl}</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          Clicks: {analytics[link.id]?.clicks || 0}
+                        </p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          Geo: {analytics[link.id]?.geo || "Unknown"}
+                        </p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          Device: {analytics[link.id]?.device || "Unknown"}
+                        </p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          OS: {analytics[link.id]?.os || "Unknown"}
+                        </p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          Browser: {analytics[link.id]?.browser || "Unknown"}
+                        </p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          Referrer: {analytics[link.id]?.referrer || "Direct"}
+                        </p>
+                      </div>
+                      <div>
+                        <LineChart
+                          width={300}
+                          height={200}
+                          data={analytics[link.id]?.history || []}
+                          className="dark:text-gray-100"
+                        >
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="date" />
+                          <YAxis />
+                          <Tooltip />
+                          <Legend />
+                          <Line type="monotone" dataKey="clicks" stroke="#2563eb" />
+                        </LineChart>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Bulk URL Shortening (Premium Feature) */}
+          <Card className="dark:bg-gray-800 dark:text-gray-100">
+            <CardHeader>
+              <CardTitle>Bulk URL Shortening (Premium)</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {isPremium ? (
+                <div>
+                  <Label>Upload CSV (Format: Long URL)</Label>
+                  <div className="border-2 border-dashed border-gray-300 p-4 text-center rounded-md dark:border-gray-600">
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Drag & drop your CSV here or{" "}
+                      <label className="text-blue-600 cursor-pointer">
+                        click to upload
+                        <input
+                          type="file"
+                          accept=".csv"
+                          className="hidden"
+                          onChange={handleBulkUpload}
+                        />
+                      </label>
+                    </p>
+                  </div>
+                  {shortenedLinks.length > 0 && (
+                    <div className="flex gap-2 mt-2">
+                      <Button
+                        onClick={() => {
+                          setBulkUrls(shortenedLinks);
+                          downloadBulkLinks("csv");
+                        }}
+                      >
+                        Download as CSV
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          setBulkUrls(shortenedLinks);
+                          downloadBulkLinks("json");
+                        }}
+                      >
+                        Download as JSON
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Upgrade to premium to unlock bulk URL shortening.
+                </p>
+              )}
+            </CardContent>
+          </Card>
         </div>
 
-            {shortenedLinks.length > 0 && (
-            <div className="bg-white p-4 rounded-lg border mb-4">
-              <div className="mt-4">
-                <h3 className="text-lg font-semibold mb-2">Latest Shortened URL</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Short URL:{" "}
-                  <a
-                    href="#"
-                    onClick={() => trackClick(shortenedLinks[shortenedLinks.length - 1].id)}
-                    className="text-blue-600"
-                  >
-                    {shortenedLinks[shortenedLinks.length - 1].shortUrl}
-                  </a>
-                </p>
-                <div className="flex justify-center mt-2" ref={qrCodeRef}></div>
-              </div>
-            </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Custom Domain Guide */}
-        <Card className="dark:bg-gray-800 dark:text-gray-100 mb-6">
-          <CardHeader>
-            <CardTitle>Custom Domain Setup Guide</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              To use a custom domain (e.g., mystore.in), follow these steps:
-            </p>
-            <ol className="list-decimal list-inside mt-2 text-sm text-gray-600 dark:text-gray-400">
-              <li>Add a CNAME record in your DNS settings pointing to our server (e.g., cname.xyz.ly).</li>
-              <li>Enter your custom domain in the field above.</li>
-              <li>Wait for DNS propagation (up to 48 hours).</li>
-              <li>Start creating branded short links!</li>
-            </ol>
-          </CardContent>
-        </Card>
-
-        {/* Shortened Links Table */}
-        {shortenedLinks.length > 0 && (
-          <Card className="dark:bg-gray-800 dark:text-gray-100 mb-6">
-            <CardHeader>
-              <CardTitle>Shortened Links</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Short URL</TableHead>
-                    <TableHead>Long URL</TableHead>
-                    <TableHead>Clicks</TableHead>
-                    <TableHead>Created At</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {shortenedLinks.map((link) => (
-                    <TableRow key={link.id}>
-                      <TableCell>
-                        <a
-                          href="#"
-                          onClick={() => trackClick(link.id)}
-                          className="text-blue-600"
-                        >
-                          {link.shortUrl}
-                        </a>
-                      </TableCell>
-                      <TableCell>{link.longUrl}</TableCell>
-                      <TableCell>{analytics[link.id]?.clicks || 0}</TableCell>
-                      <TableCell>{new Date(link.createdAt).toLocaleDateString()}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Analytics Dashboard */}
-        {shortenedLinks.length > 0 && (
-          <Card className="dark:bg-gray-800 dark:text-gray-100 mb-6">
-            <CardHeader>
-              <CardTitle>Analytics Dashboard</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {shortenedLinks.map((link) => (
-                <div key={link.id} className="mb-6">
-                  <h3 className="text-lg font-semibold mb-2">{link.shortUrl}</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        Clicks: {analytics[link.id]?.clicks || 0}
-                      </p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        Geo: {analytics[link.id]?.geo || "Unknown"}
-                      </p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        Device: {analytics[link.id]?.device || "Unknown"}
-                      </p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        OS: {analytics[link.id]?.os || "Unknown"}
-                      </p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        Browser: {analytics[link.id]?.browser || "Unknown"}
-                      </p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        Referrer: {analytics[link.id]?.referrer || "Direct"}
-                      </p>
-                    </div>
-                    <div>
-                      <LineChart
-                        width={300}
-                        height={200}
-                        data={analytics[link.id]?.history || []}
-                        className="dark:text-gray-100"
-                      >
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="date" />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend />
-                        <Line type="monotone" dataKey="clicks" stroke="#2563eb" />
-                      </LineChart>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Bulk URL Shortening (Premium Feature) */}
-        <Card className="dark:bg-gray-800 dark:text-gray-100">
-          <CardHeader>
-            <CardTitle>Bulk URL Shortening (Premium)</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {isPremium ? (
-              <div>
-                <Label>Upload CSV (Format: Long URL)</Label>
-                <div className="border-2 border-dashed border-gray-300 p-4 text-center rounded-md dark:border-gray-600">
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Drag & drop your CSV here or{" "}
-                    <label className="text-blue-600 cursor-pointer">
-                      click to upload
-                      <input
-                        type="file"
-                        accept=".csv"
-                        className="hidden"
-                        onChange={handleBulkUpload}
-                      />
-                    </label>
-                  </p>
-                </div>
-                {shortenedLinks.length > 0 && (
-                  <div className="flex gap-2 mt-2">
-                    <Button
-                      onClick={() => {
-                        setBulkUrls(shortenedLinks);
-                        downloadBulkLinks("csv");
-                      }}
-                    >
-                      Download as CSV
-                    </Button>
-                    <Button
-                      onClick={() => {
-                        setBulkUrls(shortenedLinks);
-                        downloadBulkLinks("json");
-                      }}
-                    >
-                      Download as JSON
-                    </Button>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Upgrade to premium to unlock bulk URL shortening.
-              </p>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-   
- {/* Share on WhatsApp Button */}
- <div className="flex justify-center items-center mt-6 mb-4">
-                <button
-                    onClick={shareOnWhatsApp}
-                    className="inline-flex items-center justify-center rounded-md text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 bg-[#25D366] hover:bg-[#128C7E] text-white font-medium px-6 py-2"
-                >
-                    Share on WhatsApp
-                </button>
- </div>
+        {/* Share on WhatsApp Button */}
+        <div className="flex justify-center items-center mt-6 mb-4">
+          <button
+            onClick={shareOnWhatsApp}
+            className="inline-flex items-center justify-center rounded-md text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 bg-[#25D366] hover:bg-[#128C7E] text-white font-medium px-6 py-2"
+          >
+            Share on WhatsApp
+          </button>
+        </div>
 
         <div className="mt-12 prose max-w-none opacity-100">
           <h2 className="text-2xl font-semibold mb-4">
@@ -600,22 +596,21 @@ export default function URLShortenerPage() {
               <li>Add start time (optional) for more precision.</li>
               <li>Enter the end date.</li>
               <li>Add end time (optional).</li>
-              <li>Click "Calculate Difference" to see results.</li>
+              <li>Click &quot;Calculate Difference&quot; to see results.</li>
               <li>Use Reset to start a new calculation.</li>
             </ol>
             <p>
-              The calculator automatically handles date order, so you don't need
+              The calculator automatically handles date order, so you don&apos;t need
               to worry about which date comes first. It provides comprehensive
               results including total days, weeks, working days, and weekends,
               making it useful for both personal and professional use.
             </p>
           </div>
         </div>
-      
-        </div>
+      </div>
 
-    {/* Right Section - Quick Tips */}
-    <div className="md:col-span-4 bg-white p-6 rounded-lg shadow-md space-y-6">
+      {/* Right Section - Quick Tips */}
+      <div className="md:col-span-4 bg-white p-6 rounded-lg shadow-md space-y-6">
         <div className="bg-blue-100 rounded-lg p-4">
           <h3 className="font-medium text-lg mb-2">Quick Tips</h3>
           <ul className="text-sm space-y-2">
@@ -728,8 +723,7 @@ export default function URLShortenerPage() {
             </button>
           </Link>
         </div>
-    </div>
-
+      </div>
     </div>
   );
 }

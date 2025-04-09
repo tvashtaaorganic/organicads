@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Toggle } from "@/components/ui/toggle";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress"; // Importing shadcn Progress component
-import { RefreshCcw, Sparkle } from "lucide-react"; // Importing icons from lucide-react
+import { Progress } from "@/components/ui/progress";
+import { RefreshCcw, Sparkle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -18,7 +18,6 @@ export default function WebsiteSpeedTest() {
   const [error, setError] = useState("");
   const [speedData, setSpeedData] = useState(null);
   const [analytics, setAnalytics] = useState({ live: 0, totalGenerated: 0, totalUsers: 0 });
-  const [userId, setUserId] = useState(null);
 
   // Load and save analytics client-side only
   useEffect(() => {
@@ -36,11 +35,10 @@ export default function WebsiteSpeedTest() {
       localStorage.setItem("userId", storedUserId);
 
       // Increment total users in localStorage
-      let newTotalUsers = totalUsers + 1;
+      const newTotalUsers = totalUsers + 1;
       localStorage.setItem("totalUsers", newTotalUsers.toString());
       setAnalytics((prev) => ({ ...prev, totalUsers: newTotalUsers }));
     }
-    setUserId(storedUserId);
 
     // Cleanup: Decrement live users if an analysis is in progress when the component unmounts
     return () => {
@@ -52,7 +50,7 @@ export default function WebsiteSpeedTest() {
         });
       }
     };
-  }, []);
+  }, [isLoading]); // Added isLoading as a dependency for cleanup
 
   // Save analytics to localStorage whenever they change
   useEffect(() => {
@@ -83,7 +81,7 @@ export default function WebsiteSpeedTest() {
     try {
       new URL(string);
       return true;
-    } catch (_) {
+    } catch {
       return false;
     }
   };
@@ -113,7 +111,7 @@ export default function WebsiteSpeedTest() {
 
     try {
       // Use Google PageSpeed Insights API for speed data
-      const apiKey = "AIzaSyBen0ocEkPT6jz5H7lK7cBv3rFlnRGYSbI"; // Your provided API key
+      const apiKey = "AIzaSyBen0ocEkPT6jz5H7lK7cBv3rFlnRGYSbI";
       const strategy = isMobile ? "mobile" : "desktop";
       const apiUrl = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(
         url
@@ -127,20 +125,14 @@ export default function WebsiteSpeedTest() {
       }
 
       // Extract relevant data from the API response
-      const score = Math.round(
-        data.lighthouseResult.categories.performance.score * 100
-      );
+      const score = Math.round(data.lighthouseResult.categories.performance.score * 100);
       const pageSize = (
-        data.lighthouseResult.audits["total-byte-weight"].numericValue /
-        (1024 * 1024)
+        data.lighthouseResult.audits["total-byte-weight"].numericValue / (1024 * 1024)
       ).toFixed(2); // Convert bytes to MB
-      const httpRequests =
-        data.lighthouseResult.audits["network-requests"].details.items.length;
+      const httpRequests = data.lighthouseResult.audits["network-requests"].details.items.length;
 
       // Use the custom API route to capture the screenshot
-      const screenshotApiUrl = `/api/screenshot?url=${encodeURIComponent(
-        url
-      )}&isMobile=${isMobile}`;
+      const screenshotApiUrl = `/api/screenshot?url=${encodeURIComponent(url)}&isMobile=${isMobile}`;
       const screenshotResponse = await fetch(screenshotApiUrl);
       const screenshotData = await screenshotResponse.json();
 
@@ -193,192 +185,189 @@ export default function WebsiteSpeedTest() {
     window.open(url, "_blank");
   };
 
-
   return (
     <div className="container mx-auto grid grid-cols-1 md:grid-cols-12 gap-6 mt-10 max-w-7xl px-4 sm:px-6 lg:px-8">
-    {/* Left Section - Calculator */}
-    <div className="md:col-span-8 bg-white p-6 rounded-lg shadow-md">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <h1 className="text-2xl sm:text-3xl font-bold text-center mb-2">
-          Website Speed Test
-        </h1>
-        <p className="text-center text-gray-600 mb-6 text-sm sm:text-base">
-          Test your page load speed
-        </p>
+      {/* Left Section - Calculator */}
+      <div className="md:col-span-8 bg-white p-6 rounded-lg shadow-md">
+        <div className="max-w-4xl mx-auto">
+          {/* Header */}
+          <h1 className="text-2xl sm:text-3xl font-bold text-center mb-2">
+            Website Speed Test
+          </h1>
+          <p className="text-center text-gray-600 mb-6 text-sm sm:text-base">
+            Test your page load speed
+          </p>
 
-        {/* Toggle Buttons */}
-        <div className="flex justify-center space-x-4 mb-6">
-          <Toggle
-            pressed={isMobile}
-            onPressedChange={() => setIsMobile(true)}
-            className={`px-4 py-2 rounded-full text-sm sm:text-base ${
-              isMobile
-                ? "bg-black text-white"
-                : "border bg-black text-white"
-            }`}
-          >
-            Mobile
-          </Toggle>
-          <Toggle
-            pressed={!isMobile}
-            onPressedChange={() => setIsMobile(false)}
-            className={`px-4 py-2 rounded-full text-sm sm:text-base ${
-              !isMobile
-                ? "bg-black text-white"
-                : "border bg-black text-white"
-            }`}
-          >
-            Desktop
-          </Toggle>
-        </div>
-
-        {/* Input Field */}
-        <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md mb-6">
-          <Input
-            type="text"
-            placeholder="https://example.com"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            className="mb-4 text-sm sm:text-base"
-          />
-          {error && <p className="text-red-500 mb-4 text-sm sm:text-base">{error}</p>}
-          <div className="flex justify-center space-x-4">
-            <Button
-              onClick={handleAnalyze}
-              className="bg-green-600 text-white px-4 sm:px-6 py-2 text-sm sm:text-base"
-              disabled={isLoading}
+          {/* Toggle Buttons */}
+          <div className="flex justify-center space-x-4 mb-6">
+            <Toggle
+              pressed={isMobile}
+              onPressedChange={() => setIsMobile(true)}
+              className={`px-4 py-2 rounded-full text-sm sm:text-base ${
+                isMobile ? "bg-black text-white" : "border bg-black text-white"
+              }`}
             >
-             <Sparkle /> {isLoading ? "Analyzing..." : "Analyze"}
-            </Button>
-            {speedData && (
+              Mobile
+            </Toggle>
+            <Toggle
+              pressed={!isMobile}
+              onPressedChange={() => setIsMobile(false)}
+              className={`px-4 py-2 rounded-full text-sm sm:text-base ${
+                !isMobile ? "bg-black text-white" : "border bg-black text-white"
+              }`}
+            >
+              Desktop
+            </Toggle>
+          </div>
+
+          {/* Input Field */}
+          <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md mb-6">
+            <Input
+              type="text"
+              placeholder="https://example.com"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              className="mb-4 text-sm sm:text-base"
+            />
+            {error && <p className="text-red-500 mb-4 text-sm sm:text-base">{error}</p>}
+            <div className="flex justify-center space-x-4">
               <Button
-                onClick={handleReset}
-                className="bg-black text-white px-4 sm:px-6 py-2 text-sm sm:text-base"
+                onClick={handleAnalyze}
+                className="bg-green-600 text-white px-4 sm:px-6 py-2 text-sm sm:text-base"
+                disabled={isLoading}
               >
-               <RefreshCcw /> Reset
+                <Sparkle /> {isLoading ? "Analyzing..." : "Analyze"}
               </Button>
+              {speedData && (
+                <Button
+                  onClick={handleReset}
+                  className="bg-black text-white px-4 sm:px-6 py-2 text-sm sm:text-base"
+                >
+                  <RefreshCcw /> Reset
+                </Button>
+              )}
+            </div>
+            {isLoading && (
+              <div className="mt-4">
+                <Progress value={progress} className="w-full" />
+              </div>
             )}
           </div>
-          {isLoading && (
-            <div className="mt-4">
-              <Progress value={progress} className="w-full" />
+
+          {/* Speed Test Results */}
+          {speedData && (
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md mb-6">
+              <h2 className="text-xl sm:text-2xl font-bold mb-4">Page speed score</h2>
+              <div className="flex flex-col sm:flex-row sm:space-x-6">
+                {/* Left Section: Screenshot and Details */}
+                <div className="w-full sm:w-2/3 mb-6 sm:mb-0">
+                  <div className="mb-4">
+                    <h3 className="text-lg sm:text-xl font-semibold mb-2">Screenshot</h3>
+                    <div className="border p-4 rounded-lg">
+                      {speedData.screenshot ? (
+                        <Image
+                          src={speedData.screenshot}
+                          alt="Page Screenshot"
+                          width={500} // Arbitrary width, adjust as needed
+                          height={300} // Arbitrary height, adjust as needed
+                          className="w-full h-auto rounded-lg"
+                          onError={() => console.log("Error loading screenshot")}
+                        />
+                      ) : (
+                        <div className="w-full h-48 bg-gray-200 flex items-center justify-center text-gray-500 rounded-lg">
+                          Screenshot not available
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <div>
+                      <h3 className="text-lg sm:text-xl font-semibold">Site</h3>
+                      <p className="text-blue-600 text-sm sm:text-base">{url}</p>
+                    </div>
+                    <div>
+                      <h3 className="text-lg sm:text-xl font-semibold">Page size</h3>
+                      <p className="text-gray-600 text-sm sm:text-base">
+                        {speedData.pageSize} MB
+                      </p>
+                    </div>
+                    <div>
+                      <h3 className="text-lg sm:text-xl font-semibold">HTTP requests</h3>
+                      <p className="text-gray-600 text-sm sm:text-base">
+                        {speedData.httpRequests}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Section: Speed Score */}
+                <div className="w-full sm:w-1/3">
+                  <Card className="border-none shadow-none">
+                    <CardHeader>
+                      <CardTitle className="text-center text-sm sm:text-base font-semibold text-gray-800">
+                        Total speed score
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="text-center">
+                      <div className="relative w-24 h-24 sm:w-28 sm:h-28 mx-auto mb-4">
+                        <svg className="w-full h-full" viewBox="0 0 36 36">
+                          <path
+                            d="M18 2.0845
+                              a 15.9155 15.9155 0 0 1 0 31.831
+                              a 15.9155 15.9155 0 0 1 0 -31.831"
+                            fill="none"
+                            stroke="#e5e7eb"
+                            strokeWidth="3"
+                          />
+                          <path
+                            d="M18 2.0845
+                              a 15.9155 15.9155 0 0 1 0 31.831
+                              a 15.9155 15.9155 0 0 1 0 -31.831"
+                            fill="none"
+                            stroke="#10b981"
+                            strokeWidth="3"
+                            strokeDasharray={`${speedData.score}, 100`}
+                            strokeDashoffset="0"
+                          />
+                        </svg>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className="text-2xl sm:text-3xl font-bold text-gray-800">
+                            {speedData.score}
+                          </span>
+                        </div>
+                      </div>
+                      <p className="text-sm sm:text-base font-semibold text-gray-800">
+                        Your result: {speedData.score}/100
+                      </p>
+                      <p className="text-xs sm:text-sm text-gray-600 mt-2">
+                        Your page loads fast and provides an outstanding user experience.
+                      </p>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
             </div>
           )}
-        </div>
 
-        {/* Speed Test Results */}
-        {speedData && (
-          <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md mb-6">
-            <h2 className="text-xl sm:text-2xl font-bold mb-4">Page speed score</h2>
-            <div className="flex flex-col sm:flex-row sm:space-x-6">
-              {/* Left Section: Screenshot and Details */}
-              <div className="w-full sm:w-2/3 mb-6 sm:mb-0">
-                <div className="mb-4">
-                  <h3 className="text-lg sm:text-xl font-semibold mb-2">Screenshot</h3>
-                  <div className="border p-4 rounded-lg">
-                    {speedData.screenshot ? (
-                      <img
-                        src={speedData.screenshot}
-                        alt="Page Screenshot"
-                        className="w-full h-auto rounded-lg"
-                        onError={() => console.log("Error loading screenshot")}
-                      />
-                    ) : (
-                      <div className="w-full h-48 bg-gray-200 flex items-center justify-center text-gray-500 rounded-lg">
-                        Screenshot not available
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="text-lg sm:text-xl font-semibold">Site</h3>
-                    <p className="text-blue-600 text-sm sm:text-base">{url}</p>
-                  </div>
-                  <div>
-                    <h3 className="text-lg sm:text-xl font-semibold">Page size</h3>
-                    <p className="text-gray-600 text-sm sm:text-base">
-                      {speedData.pageSize} MB
-                    </p>
-                  </div>
-                  <div>
-                    <h3 className="text-lg sm:text-xl font-semibold">HTTP requests</h3>
-                    <p className="text-gray-600 text-sm sm:text-base">
-                      {speedData.httpRequests}
-                    </p>
-                  </div>
-                </div>
+          {/* Statistics Section */}
+          <div className="mt-6 bg-gray-50 rounded-md p-6 shadow-sm">
+            <h2 className="text-md font-semibold mb-2">Statistics</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <p className="text-sm text-muted-foreground font-medium">Live Users Generating</p>
+                <span className="text-black text-2xl font-bold">{analytics.live}</span>
               </div>
-
-              {/* Right Section: Speed Score */}
-              <div className="w-full sm:w-1/3">
-                <Card className="border-none shadow-none">
-                  <CardHeader>
-                    <CardTitle className="text-center text-sm sm:text-base font-semibold text-gray-800">
-                      Total speed score
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="text-center">
-                    <div className="relative w-24 h-24 sm:w-28 sm:h-28 mx-auto mb-4">
-                      <svg className="w-full h-full" viewBox="0 0 36 36">
-                        <path
-                          d="M18 2.0845
-                            a 15.9155 15.9155 0 0 1 0 31.831
-                            a 15.9155 15.9155 0 0 1 0 -31.831"
-                          fill="none"
-                          stroke="#e5e7eb"
-                          strokeWidth="3"
-                        />
-                        <path
-                          d="M18 2.0845
-                            a 15.9155 15.9155 0 0 1 0 31.831
-                            a 15.9155 15.9155 0 0 1 0 -31.831"
-                          fill="none"
-                          stroke="#10b981"
-                          strokeWidth="3"
-                          strokeDasharray={`${speedData.score}, 100`}
-                          strokeDashoffset="0"
-                        />
-                      </svg>
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="text-2xl sm:text-3xl font-bold text-gray-800">
-                          {speedData.score}
-                        </span>
-                      </div>
-                    </div>
-                    <p className="text-sm sm:text-base font-semibold text-gray-800">
-                      Your result: {speedData.score}/100
-                    </p>
-                    <p className="text-xs sm:text-sm text-gray-600 mt-2">
-                      Your page loads fast and provides an outstanding user experience.
-                    </p>
-                  </CardContent>
-                </Card>
+              <div>
+                <p className="text-sm text-muted-foreground font-medium">Total Generated</p>
+                <p className="text-black text-2xl font-bold">{analytics.totalGenerated}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground font-medium">Total Users</p>
+                <p className="text-black text-2xl font-bold">{analytics.totalUsers}</p>
               </div>
             </div>
           </div>
-        )}
-
-        {/* Statistics Section */}
-        <div className="mt-6 bg-gray-50 rounded-md p-6 shadow-sm">
-          <h2 className="text-md font-semibold mb-2">Statistics</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div>
-              <p className="text-sm text-muted-foreground font-medium">Live Users Generating</p>
-              <span className="text-black text-2xl font-bold">{analytics.live}</span>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground font-medium">Total Generated</p>
-              <p className="text-black text-2xl font-bold">{analytics.totalGenerated}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground font-medium">Total Users</p>
-              <p className="text-black text-2xl font-bold">{analytics.totalUsers}</p>
-            </div>
-          </div>
         </div>
-      </div>
 
         {/* Share on WhatsApp Button */}
         <div className="flex justify-center items-center mt-6 mb-4">
@@ -439,14 +428,13 @@ export default function WebsiteSpeedTest() {
               <li>Use Reset to start a new calculation.</li>
             </ol>
             <p>
-              The calculator automatically handles date order, so you don't need
+              The calculator automatically handles date order, so you don&apos;t need
               to worry about which date comes first. It provides comprehensive
               results including total days, weeks, working days, and weekends,
               making it useful for both personal and professional use.
             </p>
           </div>
         </div>
-
       </div>
 
       {/* Right Section - Quick Tips */}
@@ -564,8 +552,6 @@ export default function WebsiteSpeedTest() {
           </Link>
         </div>
       </div>
-
-
     </div>
   );
 }

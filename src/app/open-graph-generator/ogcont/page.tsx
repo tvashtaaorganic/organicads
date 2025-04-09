@@ -11,7 +11,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { Copy, RefreshCcw, Tag } from "lucide-react";
 
-
 // Main component
 export default function OGTagGenerator() {
   const [title, setTitle] = useState('')
@@ -33,13 +32,6 @@ export default function OGTagGenerator() {
     const updatedUrls = [...imageUrls]
     updatedUrls[index] = value
     setImageUrls(updatedUrls)
-  }
-
-  // Add new image URL input
-  const addImageUrl = () => {
-    if (imageUrls.length < parseInt(numImages)) {
-      setImageUrls([...imageUrls, ''])
-    }
   }
 
   // Generate OG and Twitter tags

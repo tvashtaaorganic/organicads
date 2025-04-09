@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -15,7 +15,7 @@ export default function KeywordDensityChecker() {
   const [totalWords, setTotalWords] = useState(0);
   const [keywordResults, setKeywordResults] = useState([]);
 
-  const calculateDensity = () => {
+  const calculateDensity = useCallback(() => {
     if (!keywords.trim() || !content.trim()) {
       setTotalWords(0);
       setKeywordResults([]);
@@ -63,12 +63,12 @@ export default function KeywordDensityChecker() {
     });
 
     setKeywordResults(results);
-  };
+  }, [keywords, content]);
 
   // Use useEffect to update density in real-time as the user types
   useEffect(() => {
     calculateDensity();
-  }, [keywords, content]);
+  }, [calculateDensity]);
 
   const resetFields = () => {
     setKeywords("");
@@ -157,7 +157,7 @@ Status: ${result.status}`
                   className="flex justify-between items-center bg-muted p-3 rounded-md mb-2"
                 >
                   <div>
-                    <p className="text-sm font-medium text-black mb-2">"{result.keyword}"</p>
+                    <p className="text-sm font-medium text-black mb-2">&quot;{result.keyword}&quot;</p>
                     <p className="text-xs text-gray-500 mb-1">Ideal range: 1% - 3%</p>
                     <p className="text-sm font-medium text-black">{result.density}% density</p>
                   </div>
@@ -237,11 +237,11 @@ Status: ${result.status}`
               <li>Add start time (optional) for more precision.</li>
               <li>Enter the end date.</li>
               <li>Add end time (optional).</li>
-              <li>Click "Calculate Difference" to see results.</li>
+              <li>Click &quot;Calculate Difference&quot; to see results.</li>
               <li>Use Reset to start a new calculation.</li>
             </ol>
             <p>
-              The calculator automatically handles date order, so you don't need
+              The calculator automatically handles date order, so you don&apos;t need
               to worry about which date comes first. It provides comprehensive
               results including total days, weeks, working days, and weekends,
               making it useful for both personal and professional use.

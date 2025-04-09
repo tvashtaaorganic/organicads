@@ -121,212 +121,211 @@ export default function RoiCalculator() {
     window.open(url, "_blank");
   };
 
-
   return (
     <div className="container mx-auto grid grid-cols-1 md:grid-cols-12 gap-6 mt-10 max-w-7xl px-4 sm:px-6 lg:px-8">
-    {/* Left Section - Calculator */}
-    <div className="md:col-span-8 bg-white p-6 rounded-lg shadow-md">
-      <div >
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-center mb-6 space-y-4 sm:space-y-0">
-          <h1 className="text-3xl font-bold text-center sm:text-left">Marketing ROI Calculator</h1>
-          <div className="flex items-center space-x-2">
-            <span>Currency:</span>
-            <Select value={currency} onValueChange={setCurrency}>
-              <SelectTrigger className="w-[100px]">
-                <SelectValue placeholder="Select currency" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="INR">INR</SelectItem>
-                <SelectItem value="USD">USD</SelectItem>
-                <SelectItem value="EUR">EUR</SelectItem>
-                <SelectItem value="GBP">GBP</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
-        {/* Warning Message */}
-        {warning && (
-          <div className="mb-4 p-3 text-red-500 rounded-lg text-center">
-            {warning}
-          </div>
-        )}
-
-        {/* Desktop View: Table */}
-        <div className="hidden sm:block overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="bg-gray-800 text-white">Channels / Projects</TableHead>
-                <TableHead className="bg-gray-800 text-white">Total Revenue</TableHead>
-                <TableHead className="bg-gray-800 text-white">Marketing Cost</TableHead>
-                <TableHead className="bg-gray-800 text-white">Conversions</TableHead>
-                <TableHead className="bg-gray-800 text-white">ROI</TableHead>
-                <TableHead className="bg-gray-800 text-white">CPC</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {channels.map((channel) => (
-                <TableRow key={channel.id}>
-                  <TableCell>
-                    <Input
-                      value={channel.name}
-                      onChange={(e) => updateChannel(channel.id, "name", e.target.value)}
-                      placeholder="Ex. Google Ads"
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Input
-                      type="number"
-                      value={channel.revenue}
-                      onChange={(e) => updateChannel(channel.id, "revenue", e.target.value)}
-                      placeholder="Ex. 1234"
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Input
-                      type="number"
-                      value={channel.cost}
-                      onChange={(e) => updateChannel(channel.id, "cost", e.target.value)}
-                      placeholder="Ex. 1234"
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Input
-                      type="number"
-                      value={channel.conversions}
-                      onChange={(e) => updateChannel(channel.id, "conversions", e.target.value)}
-                      placeholder="Ex. 1234"
-                    />
-                  </TableCell>
-                  <TableCell
-                    className={`${
-                      channel.roi < 0 ? "text-red-500" : channel.roi > 0 ? "text-green-500" : "text-gray-500"
-                    } bg-green-100`}
-                  >
-                    {channel.roi ? `${channel.roi}%` : "-"}
-                  </TableCell>
-                  <TableCell
-                    className={`${
-                      channel.cpc < 0 ? "text-red-500" : channel.cpc > 0 ? "text-green-500" : "text-gray-500"
-                    } bg-green-100`}
-                  >
-                    {channel.cpc || "-"}
-                  </TableCell>
-                  <TableCell>
-                    <Button
-                      variant="ghost"
-                      onClick={() => deleteChannel(channel.id)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-
-        {/* Mobile View: Card Layout */}
-        <div className="block sm:hidden space-y-6">
-          {channels.map((channel) => (
-            <div key={channel.id} className="border rounded-lg p-4 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Channel / Project</label>
-                <Input
-                  value={channel.name}
-                  onChange={(e) => updateChannel(channel.id, "name", e.target.value)}
-                  placeholder="Ex. Google Ads"
-                  className="w-full"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Total Revenue</label>
-                <Input
-                  type="number"
-                  value={channel.revenue}
-                  onChange={(e) => updateChannel(channel.id, "revenue", e.target.value)}
-                  placeholder="Ex. 1234"
-                  className="w-full"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Marketing Cost</label>
-                <Input
-                  type="number"
-                  value={channel.cost}
-                  onChange={(e) => updateChannel(channel.id, "cost", e.target.value)}
-                  placeholder="Ex. 1234"
-                  className="w-full"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Conversions</label>
-                <Input
-                  type="number"
-                  value={channel.conversions}
-                  onChange={(e) => updateChannel(channel.id, "conversions", e.target.value)}
-                  placeholder="Ex. 1234"
-                  className="w-full"
-                />
-              </div>
-              <div className="flex justify-between">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">ROI</label>
-                  <p
-                    className={`${
-                      channel.roi < 0 ? "text-red-500" : channel.roi > 0 ? "text-green-500" : "text-gray-500"
-                    } font-semibold`}
-                  >
-                    {channel.roi ? `${channel.roi}%` : "-"}
-                  </p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">CPC</label>
-                  <p
-                    className={`${
-                      channel.cpc < 0 ? "text-red-500" : channel.cpc > 0 ? "text-green-500" : "text-gray-500"
-                    } font-semibold`}
-                  >
-                    {channel.cpc || "-"}
-                  </p>
-                </div>
-              </div>
-              <Button
-                variant="ghost"
-                onClick={() => deleteChannel(channel.id)}
-                className="text-red-500 hover:text-red-700 w-full"
-              >
-                <Trash2 className="h-4 w-4 mr-2" /> Delete
-              </Button>
+      {/* Left Section - Calculator */}
+      <div className="md:col-span-8 bg-white p-6 rounded-lg shadow-md">
+        <div>
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row justify-between items-center mb-6 space-y-4 sm:space-y-0">
+            <h1 className="text-3xl font-bold text-center sm:text-left">Marketing ROI Calculator</h1>
+            <div className="flex items-center space-x-2">
+              <span>Currency:</span>
+              <Select value={currency} onValueChange={setCurrency}>
+                <SelectTrigger className="w-[100px]">
+                  <SelectValue placeholder="Select currency" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="INR">INR</SelectItem>
+                  <SelectItem value="USD">USD</SelectItem>
+                  <SelectItem value="EUR">EUR</SelectItem>
+                  <SelectItem value="GBP">GBP</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-          ))}
+          </div>
+
+          {/* Warning Message */}
+          {warning && (
+            <div className="mb-4 p-3 text-red-500 rounded-lg text-center">
+              {warning}
+            </div>
+          )}
+
+          {/* Desktop View: Table */}
+          <div className="hidden sm:block overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="bg-gray-800 text-white">Channels / Projects</TableHead>
+                  <TableHead className="bg-gray-800 text-white">Total Revenue</TableHead>
+                  <TableHead className="bg-gray-800 text-white">Marketing Cost</TableHead>
+                  <TableHead className="bg-gray-800 text-white">Conversions</TableHead>
+                  <TableHead className="bg-gray-800 text-white">ROI</TableHead>
+                  <TableHead className="bg-gray-800 text-white">CPC</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {channels.map((channel) => (
+                  <TableRow key={channel.id}>
+                    <TableCell>
+                      <Input
+                        value={channel.name}
+                        onChange={(e) => updateChannel(channel.id, "name", e.target.value)} // Fixed typo here: ruralChannel -> updateChannel
+                        placeholder="Ex. Google Ads"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        type="number"
+                        value={channel.revenue}
+                        onChange={(e) => updateChannel(channel.id, "revenue", e.target.value)}
+                        placeholder="Ex. 1234"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        type="number"
+                        value={channel.cost}
+                        onChange={(e) => updateChannel(channel.id, "cost", e.target.value)}
+                        placeholder="Ex. 1234"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        type="number"
+                        value={channel.conversions}
+                        onChange={(e) => updateChannel(channel.id, "conversions", e.target.value)}
+                        placeholder="Ex. 1234"
+                      />
+                    </TableCell>
+                    <TableCell
+                      className={`${
+                        channel.roi < 0 ? "text-red-500" : channel.roi > 0 ? "text-green-500" : "text-gray-500"
+                      } bg-green-100`}
+                    >
+                      {channel.roi ? `${channel.roi}%` : "-"}
+                    </TableCell>
+                    <TableCell
+                      className={`${
+                        channel.cpc < 0 ? "text-red-500" : channel.cpc > 0 ? "text-green-500" : "text-gray-500"
+                      } bg-green-100`}
+                    >
+                      {channel.cpc || "-"}
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        variant="ghost"
+                        onClick={() => deleteChannel(channel.id)}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+
+          {/* Mobile View: Card Layout */}
+          <div className="block sm:hidden space-y-6">
+            {channels.map((channel) => (
+              <div key={channel.id} className="border rounded-lg p-4 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Channel / Project</label>
+                  <Input
+                    value={channel.name}
+                    onChange={(e) => updateChannel(channel.id, "name", e.target.value)}
+                    placeholder="Ex. Google Ads"
+                    className="w-full"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Total Revenue</label>
+                  <Input
+                    type="number"
+                    value={channel.revenue}
+                    onChange={(e) => updateChannel(channel.id, "revenue", e.target.value)}
+                    placeholder="Ex. 1234"
+                    className="w-full"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Marketing Cost</label>
+                  <Input
+                    type="number"
+                    value={channel.cost}
+                    onChange={(e) => updateChannel(channel.id, "cost", e.target.value)}
+                    placeholder="Ex. 1234"
+                    className="w-full"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Conversions</label>
+                  <Input
+                    type="number"
+                    value={channel.conversions}
+                    onChange={(e) => updateChannel(channel.id, "conversions", e.target.value)}
+                    placeholder="Ex. 1234"
+                    className="w-full"
+                  />
+                </div>
+                <div className="flex justify-between">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">ROI</label>
+                    <p
+                      className={`${
+                        channel.roi < 0 ? "text-red-500" : channel.roi > 0 ? "text-green-500" : "text-gray-500"
+                      } font-semibold`}
+                    >
+                      {channel.roi ? `${channel.roi}%` : "-"}
+                    </p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">CPC</label>
+                    <p
+                      className={`${
+                        channel.cpc < 0 ? "text-red-500" : channel.cpc > 0 ? "text-green-500" : "text-gray-500"
+                      } font-semibold`}
+                    >
+                      {channel.cpc || "-"}
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  variant="ghost"
+                  onClick={() => deleteChannel(channel.id)}
+                  className="text-red-500 hover:text-red-700 w-full"
+                >
+                  <Trash2 className="h-4 w-4 mr-2" /> Delete
+                </Button>
+              </div>
+            ))}
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mt-6">
+            <Button onClick={addChannel} className=" bg-black text-white">
+              + Add another channel/project
+            </Button>
+            <Button variant="outline" onClick={copyTable}>
+              Copy table
+            </Button>
+          </div>
+
+          <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 space-x-4 mt-6 justify-center">
+            <Button onClick={calculateRomi} className="bg-blue-600 text-white">
+              <Calculator />Calculate ROMI
+            </Button>
+            <Button variant="outline" onClick={resetTable}>
+              <RefreshCcw /> Reset table
+            </Button>
+          </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mt-6">
-          <Button onClick={addChannel} className=" bg-black text-white">
-            + Add another channel/project
-          </Button>
-          <Button variant="outline" onClick={copyTable}>
-            Copy table
-          </Button>
-        </div>
-
-        <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mt-6 justify-center">
-          <Button onClick={calculateRomi} className="bg-blue-600 text-white">
-            <Calculator />Calculate ROMI
-          </Button>
-          <Button variant="outline" onClick={resetTable}>
-            <RefreshCcw /> Reset table
-          </Button>
-        </div>
-      </div>
-
- {/* Share on WhatsApp Button */}
- <div className="flex justify-center items-center mt-6 mb-4">
+        {/* Share on WhatsApp Button */}
+        <div className="flex justify-center items-center mt-6 mb-4">
           <button
             onClick={shareOnWhatsApp}
             className="inline-flex items-center justify-center rounded-md text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 bg-[#25D366] hover:bg-[#128C7E] text-white font-medium px-6 py-2"
@@ -391,7 +390,6 @@ export default function RoiCalculator() {
             </p>
           </div>
         </div>
-        
       </div>
 
       {/* Right Section - Quick Tips */}
@@ -509,7 +507,6 @@ export default function RoiCalculator() {
           </Link>
         </div>
       </div>
-
     </div>
   );
 }

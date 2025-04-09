@@ -1,17 +1,17 @@
-const express = require("express");
-const { exec } = require("child_process");
-const fs = require("fs");
-const path = require("path");
-const cors = require("cors");
+import express from "express";
+import { exec } from "child_process";
+import { readdir, existsSync, mkdirSync } from "fs";
+import { join } from "path";
+import cors from "cors";
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 // Ensure the downloads directory exists
-const downloadsDir = path.join(__dirname, "downloads");
-if (!fs.existsSync(downloadsDir)) {
-  fs.mkdirSync(downloadsDir);
+const downloadsDir = join(__dirname, "downloads");
+if (!existsSync(downloadsDir)) {
+  mkdirSync(downloadsDir);
 }
 
 app.post("/download", (req, res) => {
@@ -38,8 +38,8 @@ app.post("/download", (req, res) => {
       }
 
       // Find the downloaded file
-      const postDir = path.join(downloadsDir, shortcode);
-      fs.readdir(postDir, (err, files) => {
+      const postDir = join(downloadsDir, shortcode);
+      readdir(postDir, (err, files) => {
         if (err || !files.length) {
           return res.status(500).json({ error: "Failed to find downloaded media" });
         }

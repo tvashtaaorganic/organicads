@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import axios from "axios";
+import axios, { AxiosError } from "axios"; // Import AxiosError
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
@@ -47,10 +47,11 @@ export default function MetaTagExtractor() {
   useEffect(() => {
     const fetchCounter = async () => {
       try {
-        const response = await axios.get("/api/extract-meta-tags");
+        const response = await axios.get<CounterData>("/api/extract-meta-tags");
         setCounter(response.data);
-      } catch (err) {
-        console.error("Failed to fetch counter data:", err);
+      } catch (_) {
+        // Use _ to indicate unused error variable
+        console.error("Failed to fetch counter data");
       }
     };
 
@@ -72,7 +73,7 @@ export default function MetaTagExtractor() {
 
       setUrl(baseUrl);
       setPath(pathName);
-    } catch (err) {
+    } catch (_) {
       // If URL parsing fails, keep the path as is
       setPath("/");
     }
@@ -92,15 +93,19 @@ export default function MetaTagExtractor() {
     setResults([]);
 
     try {
-      const response = await axios.post("/api/extract-meta-tags", {
-        url: fullUrl,
-      });
+      const response = await axios.post<{ metaTags: MetaTag[] }>(
+        "/api/extract-meta-tags",
+        { url: fullUrl }
+      );
       setResults(response.data.metaTags);
       // Fetch updated counter after a successful test
-      const counterResponse = await axios.get("/api/extract-meta-tags");
+      const counterResponse = await axios.get<CounterData>("/api/extract-meta-tags");
       setCounter(counterResponse.data);
-    } catch (err: any) {
-      setError(err.response?.data?.error || "Failed to extract meta tags.");
+    } catch (err) {
+      const axiosError = err as AxiosError<{ error?: string }>;
+      setError(
+        axiosError.response?.data?.error || "Failed to extract meta tags."
+      );
     } finally {
       setLoading(false);
     }
@@ -114,7 +119,7 @@ export default function MetaTagExtractor() {
   };
 
   const shareOnWhatsApp = () => {
-    const message = `Check out this awesome Loan EMI Calculator:\n\nhttps://yourwebsite.com/loan-emi-calculator`;
+    const message = `Check out this awesome Meta Tag Extractor:\n\nhttps://yourwebsite.com/extract-meta-tags`;
     const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
     window.open(url, "_blank");
   };
@@ -161,7 +166,7 @@ export default function MetaTagExtractor() {
               </Button>
             </div>
           </form>
-        
+
           <div className="mt-6">
             <h2 className="text-lg font-semibold mb-2">Meta Tags</h2>
             {error && <p className="text-red-500 mb-2">{error}</p>}
@@ -238,55 +243,50 @@ export default function MetaTagExtractor() {
 
         <section className="mt-12 prose max-w-none opacity-100 transform-none">
           <h2 className="text-2xl font-semibold mb-4">
-            About Loan EMI Calculator
+            About Meta Tag Extractor
           </h2>
           <div className="space-y-4">
             <p>
-              Our Loan EMI Calculator helps you plan your loans better by
-              calculating your Equated Monthly Installments (EMI) based on the
-              loan amount, interest rate, and tenure. This tool is essential for
-              making informed decisions about loans and understanding your
-              financial commitments.
+              Our Meta Tag Extractor is a powerful tool designed to retrieve and
+              display meta tags from any webpage. It helps you analyze how search
+              engines like Google and Bing interpret your site’s metadata,
+              aiding in SEO optimization and content strategy.
             </p>
             <h3 className="text-xl font-medium">Features:</h3>
             <ul className="list-disc pl-6 space-y-2">
               <li>
-                <strong>EMI Calculation:</strong> Calculate your monthly loan
-                payments
+                <strong>Meta Tag Extraction:</strong> Pulls all meta tags from a URL.
               </li>
               <li>
-                <strong>Interest Breakdown:</strong> See total interest payable
+                <strong>Search Engine Insights:</strong> Shows which tags are used by Google and Bing.
               </li>
               <li>
-                <strong>Loan Analysis:</strong> View total payment including
-                principal and interest
+                <strong>Real-Time Stats:</strong> Tracks active users, total tests, and unique URLs.
               </li>
               <li>
-                <strong>Flexible Inputs:</strong> Adjust values using sliders or
-                enter them directly
+                <strong>Easy Interface:</strong> Simple input for domain and path.
               </li>
             </ul>
             <h3 className="text-xl font-medium">Common Uses:</h3>
             <ul className="list-disc pl-6 space-y-2">
-              <li>Home loan planning</li>
-              <li>Car loan calculations</li>
-              <li>Personal loan assessment</li>
-              <li>Business loan analysis</li>
-              <li>Education loan planning</li>
+              <li>SEO audits</li>
+              <li>Competitor analysis</li>
+              <li>Website debugging</li>
+              <li>Content optimization</li>
+              <li>Metadata validation</li>
             </ul>
             <h3 className="text-xl font-medium">How to Use:</h3>
             <ol className="list-decimal pl-6 space-y-2">
-              <li>Enter the loan amount using the slider or input field</li>
-              <li>Set the interest rate</li>
-              <li>Choose the loan tenure in years</li>
-              <li>View your monthly EMI amount</li>
-              <li>Check the total interest and payment details</li>
+              <li>Enter the domain (e.g., http://example.com).</li>
+              <li>Specify the path (e.g., /about).</li>
+              <li>Click "Submit" to extract meta tags.</li>
+              <li>View the results in a detailed table.</li>
+              <li>Use "Reset" to clear and start over.</li>
             </ol>
             <p>
-              The calculator provides instant results as you adjust the values,
-              helping you understand how different loan parameters affect your
-              monthly payments. This makes it easier to choose a loan that fits
-              your budget and financial goals.
+              This tool provides instant feedback on meta tag usage, helping you
+              optimize your website for better search engine visibility and user
+              experience.
             </p>
           </div>
         </section>
@@ -303,10 +303,10 @@ export default function MetaTagExtractor() {
           </ul>
         </div>
         <div className="bg-muted rounded-lg p-4">
-          <h4 className="font-semibold mb-2">Calculator Stats</h4>
-          <p className="text-sm">Trusted by students and professionals</p>
+          <h4 className="font-semibold mb-2">Tool Stats</h4>
+          <p className="text-sm">Trusted by developers and SEO experts</p>
           <p className="text-xs mt-1 text-muted-foreground">
-            Over 10,000 calculations daily
+            Over 5,000 URLs tested daily
           </p>
         </div>
 
@@ -325,7 +325,7 @@ export default function MetaTagExtractor() {
           <div className="flex items-center gap-1 mb-2">
             <div className="flex text-yellow-400">
               {Array(5)
-                .fill()
+                .fill(0)
                 .map((_, i) => (
                   <svg
                     key={i}
@@ -358,7 +358,7 @@ export default function MetaTagExtractor() {
                   <div className="text-lg font-semibold">Excellent</div>
                   <div className="flex text-[#00b67a]">
                     {Array(5)
-                      .fill()
+                      .fill(0)
                       .map((_, i) => (
                         <svg
                           key={i}
@@ -388,7 +388,7 @@ export default function MetaTagExtractor() {
                 </div>
               </div>
             </div>
-          </div>
+vocab          </div>
 
           <p className="text-sm mb-4">
             🎯 We build your business into a Brand. 🌐 Helping Businesses
@@ -407,7 +407,6 @@ export default function MetaTagExtractor() {
           </Link>
         </div>
       </div>
-      
     </div>
   );
 }

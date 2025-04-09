@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,27 +12,27 @@ import Link from "next/link";
 import { Sparkle, RefreshCw, Copy, Globe } from "lucide-react";
 
 export default function SiteFetcher() {
-  const [domain, setDomain] = useState('');
-  const [siteData, setSiteData] = useState(null);
-  const [editedTitle, setEditedTitle] = useState('');
-  const [editedDescription, setEditedDescription] = useState('');
-  const [error, setError] = useState('');
-  const [copyStatus, setCopyStatus] = useState('');
+  const [domain, setDomain] = useState("");
+  const [siteData, setSiteData] = useState<any>(null); // Consider typing this properly later
+  const [editedTitle, setEditedTitle] = useState("");
+  const [editedDescription, setEditedDescription] = useState("");
+  const [error, setError] = useState("");
+  const [copyStatus, setCopyStatus] = useState("");
   const [showFavicon, setShowFavicon] = useState(true);
   const [showRating, setShowRating] = useState(true);
   const [showDate, setShowDate] = useState(true);
-  const [device, setDevice] = useState('desktop');
+  const [device, setDevice] = useState<"desktop" | "mobile">("desktop");
   const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState(0);
 
   const fetchSiteData = async () => {
     if (!domain.trim()) {
       setSiteData(null);
-      setError('Domain is required');
+      setError("Domain is required");
       return;
     }
 
-    setError('');
+    setError("");
     setIsLoading(true);
     setProgress(10);
 
@@ -41,9 +41,9 @@ export default function SiteFetcher() {
         setProgress((prev) => (prev < 80 ? prev + 10 : prev));
       }, 300);
 
-      const response = await fetch('/api/fetchsite', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/fetchsite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ domain }),
       });
 
@@ -57,9 +57,9 @@ export default function SiteFetcher() {
       setSiteData(data);
       setEditedTitle(data.pageTitle);
       setEditedDescription(data.metaDescription);
-    } catch (err) {
-      console.error('Fetch Error:', err);
-      setError('Failed to fetch site data: ' + err.message);
+    } catch (err: any) {
+      console.error("Fetch Error:", err);
+      setError("Failed to fetch site data: " + err.message);
       setSiteData(null);
     } finally {
       setIsLoading(false);
@@ -68,26 +68,26 @@ export default function SiteFetcher() {
   };
 
   const resetForm = () => {
-    setDomain('');
+    setDomain("");
     setSiteData(null);
-    setEditedTitle('');
-    setEditedDescription('');
-    setError('');
-    setCopyStatus('');
+    setEditedTitle("");
+    setEditedDescription("");
+    setError("");
+    setCopyStatus("");
     setShowFavicon(true);
     setShowRating(true);
     setShowDate(true);
-    setDevice('desktop');
+    setDevice("desktop");
     setIsLoading(false);
     setProgress(0);
   };
 
   const handleCopy = () => {
     if (siteData) {
-      const content = `Title: ${editedTitle}\nDescription: ${editedDescription}\n${showRating ? `Rating: ${siteData.rating} ★★★★☆ (${siteData.reviews} reviews)\n` : ''}${showDate ? `Date: ${siteData.date}\n` : ''}Characters: Title: ${editedTitle.length}, Description: ${editedDescription.length}`;
+      const content = `Title: ${editedTitle}\nDescription: ${editedDescription}\n${showRating ? `Rating: ${siteData.rating} ★★★★☆ (${siteData.reviews} reviews)\n` : ""}${showDate ? `Date: ${siteData.date}\n` : ""}Characters: Title: ${editedTitle.length}, Description: ${editedDescription.length}`;
       navigator.clipboard.writeText(content);
-      setCopyStatus('Copied to clipboard!');
-      setTimeout(() => setCopyStatus(''), 2000);
+      setCopyStatus("Copied to clipboard!");
+      setTimeout(() => setCopyStatus(""), 2000);
     }
   };
 
@@ -99,7 +99,7 @@ export default function SiteFetcher() {
   }, [siteData]);
 
   const shareOnWhatsApp = () => {
-    const message = `Check out this awesome Loan EMI Calculator:\n\nhttps://yourwebsite.com/loan-emi-calculator`;
+    const message = `Check out this awesome SERP Snippet Preview Generator:\n\nhttps://yourwebsite.com/google-serp-simulator`;
     const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
     window.open(url, "_blank");
   };
@@ -108,159 +108,162 @@ export default function SiteFetcher() {
     <div className="container mx-auto grid grid-cols-1 md:grid-cols-12 gap-6 mt-10 max-w-7xl px-4 sm:px-6 lg:px-8">
       {/* Left Section - Calculator */}
       <div className="md:col-span-8 bg-white p-6 rounded-lg shadow-md">
-      <Card className="w-full mx-auto">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold">SERP Snippet Preview Generator</CardTitle>
-          <p className="text-sm text-muted-foreground">Fetch and preview website details based on a domain.</p>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Enter Domain</h3>
-            <div className="flex space-x-2 items-center">
-              <div className="flex-1">
-                <Label htmlFor="domain" className="block mb-2">URL</Label>
-                <Input
-                  id="domain"
-                  value={domain}
-                  onChange={(e) => setDomain(e.target.value.trim().replace(/^https?:\/\//, ''))}
-                  placeholder="e.g., example.com"
+        <Card className="w-full mx-auto">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold">SERP Snippet Preview Generator</CardTitle>
+            <p className="text-sm text-muted-foreground">Fetch and preview website details based on a domain.</p>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Enter Domain</h3>
+              <div className="flex space-x-2 items-center">
+                <div className="flex-1">
+                  <Label htmlFor="domain" className="block mb-2">URL</Label>
+                  <Input
+                    id="domain"
+                    value={domain}
+                    onChange={(e) => setDomain(e.target.value.trim().replace(/^https?:\/\//, ""))}
+                    placeholder="e.g., example.com"
+                    disabled={isLoading}
+                  />
+                </div>
+                <Button
+                  onClick={fetchSiteData}
+                  className="bg-blue-500 hover:bg-blue-600 text-white mt-5"
                   disabled={isLoading}
-                />
+                >
+                  <Sparkle /> {isLoading ? "Fetching..." : "FETCH"}
+                </Button>
               </div>
-              <Button
-                onClick={fetchSiteData}
-                className="bg-blue-500 hover:bg-blue-600 text-white mt-5"
-                disabled={isLoading}
-              >
-                <Sparkle /> {isLoading ? 'Fetching...' : 'FETCH'}
-              </Button>
-            </div>
-            {isLoading && (
-              <div className="space-y-2">
-                <p className="text-sm text-gray-500">Fetching data...</p>
-                <Progress value={progress} className="w-full" />
+              {isLoading && (
+                <div className="space-y-2">
+                  <p className="text-sm text-gray-500">Fetching data...</p>
+                  <Progress value={progress} className="w-full" />
+                </div>
+              )}
+              <div className="flex space-x-4">
+                <Button
+                  variant={device === "desktop" ? "default" : "outline"}
+                  onClick={() => setDevice("desktop")}
+                  disabled={isLoading}
+                >
+                  Desktop
+                </Button>
+                <Button
+                  variant={device === "mobile" ? "default" : "outline"}
+                  onClick={() => setDevice("mobile")}
+                  disabled={isLoading}
+                >
+                  Mobile
+                </Button>
               </div>
-            )}
-            <div className="flex space-x-4">
-              <Button
-                variant={device === 'desktop' ? 'default' : 'outline'}
-                onClick={() => setDevice('desktop')}
-                disabled={isLoading}
-              >
-                Desktop
-              </Button>
-              <Button
-                variant={device === 'mobile' ? 'default' : 'outline'}
-                onClick={() => setDevice('mobile')}
-                disabled={isLoading}
-              >
-                Mobile
-              </Button>
-            </div>
-            {error && <p className="text-red-500 text-sm">{error}</p>}
-            {siteData && !isLoading && (
-              <div className="mt-6 space-y-6">
-                {/* Editable Title */}
-                <div className="bg-white p-4 rounded-lg shadow mt-6 space-y-6">
-                <div>
-                  <Label htmlFor="editedTitle" className="block mb-2">Edit Title</Label>
-                  <Input
-                    id="editedTitle"
-                    value={editedTitle}
-                    onChange={(e) => setEditedTitle(e.target.value)}
-                    placeholder="Edit title here"
-                  />
-                  <p className="text-sm text-gray-500 mt-1">
-                    Character count: {editedTitle.length}
-                  </p>
-                </div>
-                {/* Editable Description */}
-                <div>
-                  <Label htmlFor="editedDescription" className="block mb-2">Edit Description</Label>
-                  <Input
-                    id="editedDescription"
-                    value={editedDescription}
-                    onChange={(e) => setEditedDescription(e.target.value)}
-                    placeholder="Edit description here"
-                  />
-                  <p className="text-sm text-gray-500 mt-1">
-                    Character count: {editedDescription.length}
-                  </p>
-                </div>
-                </div>
-
-                {/* Preview */}
-                <div style={{ maxWidth: device === 'mobile' ? '320px' : '720px', padding: '10px', border: '1px solid #dfe1e5', borderRadius: '8px', backgroundColor: '#fff' }}>
-                  <div className="flex items-center space-x-2">
-                    {showFavicon && siteData.faviconUrl && (
-                      <img
-                        src={siteData.faviconUrl}
-                        alt="Favicon"
-                        className="w-6 h-6 mr-2 mt-4"
-                        onError={(e) => { e.target.style.display = 'none'; }}
-                      />
-                    )}
+              {error && <p className="text-red-500 text-sm">{error}</p>}
+              {siteData && !isLoading && (
+                <div className="mt-6 space-y-6">
+                  {/* Editable Title */}
+                  <div className="bg-white p-4 rounded-lg shadow mt-6 space-y-6">
                     <div>
-                      <div className="flex items-center space-x-1">
-                        <span className="text-red-500 text-sm"><Globe className="w-4 h-4" /></span>
-                        <a href={`http://${domain}`} target="_blank" rel="noopener noreferrer" className="text-green-700 text-sm">
-                          {domain}
-                        </a>
+                      <Label htmlFor="editedTitle" className="block mb-2">Edit Title</Label>
+                      <Input
+                        id="editedTitle"
+                        value={editedTitle}
+                        onChange={(e) => setEditedTitle(e.target.value)}
+                        placeholder="Edit title here"
+                      />
+                      <p className="text-sm text-gray-500 mt-1">
+                        Character count: {editedTitle.length}
+                      </p>
+                    </div>
+                    {/* Editable Description */}
+                    <div>
+                      <Label htmlFor="editedDescription" className="block mb-2">Edit Description</Label>
+                      <Input
+                        id="editedDescription"
+                        value={editedDescription}
+                        onChange={(e) => setEditedDescription(e.target.value)}
+                        placeholder="Edit description here"
+                      />
+                      <p className="text-sm text-gray-500 mt-1">
+                        Character count: {editedDescription.length}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Preview */}
+                  <div style={{ maxWidth: device === "mobile" ? "320px" : "720px", padding: "10px", border: "1px solid #dfe1e5", borderRadius: "8px", backgroundColor: "#fff" }}>
+                    <div className="flex items-center space-x-2">
+                      {showFavicon && siteData.faviconUrl && (
+                        <Image
+                          src={siteData.faviconUrl}
+                          alt="Favicon"
+                          width={24}
+                          height={24}
+                          className="mr-2 mt-4"
+                          onError={(e) => { e.currentTarget.style.display = "none"; }}
+                          unoptimized // Skip optimization for dynamic favicon URLs
+                        />
+                      )}
+                      <div>
+                        <div className="flex items-center space-x-1">
+                          <span className="text-red-500 text-sm"><Globe className="w-4 h-4" /></span>
+                          <a href={`http://${domain}`} target="_blank" rel="noopener noreferrer" className="text-green-700 text-sm">
+                            {domain}
+                          </a>
+                        </div>
+                        <div className="text-blue-600 text-lg font-semibold">{editedTitle}</div>
                       </div>
-                      <div className="text-blue-600 text-lg font-semibold">{editedTitle}</div>
                     </div>
-                  </div>
-                  {showRating && (
-                    <div className="flex items-center space-x-2 mb-3 mt-3">
-                      <span className="text-yellow-400">★★★★☆</span>
-                      <span className="text-black">Rating: {siteData.rating} - {siteData.reviews} reviews</span>
+                    {showRating && (
+                      <div className="flex items-center space-x-2 mb-3 mt-3">
+                        <span className="text-yellow-400">★★★★☆</span>
+                        <span className="text-black">Rating: {siteData.rating} - {siteData.reviews} reviews</span>
+                      </div>
+                    )}
+                    <p className="text-gray-600 mb-3 mt-3 space-x-2">
+                      {showDate && <span className="text-black">{siteData.date} - </span>}
+                      {editedDescription}
+                    </p>
+                    <div className="flex space-x-2 mb-5 mt-5">
+                      <Button variant="outline" onClick={handleCopy} className="flex-1">
+                        <Copy /> Copy to Clipboard
+                      </Button>
+                      <Button variant="destructive" onClick={resetForm} className="flex-1">
+                        <RefreshCw /> Reset
+                      </Button>
                     </div>
-                  )}
-                  <p className="text-gray-600 mb-3 mt-3 space-x-2">
-                    {showDate && <span className="text-black">{siteData.date} - </span>}
-                    {editedDescription}
-                  </p>
-                  <div className="flex space-x-2 mb-5 mt-5">
-                    <Button variant="outline" onClick={handleCopy} className="flex-1">
-                    <Copy /> Copy to Clipboard
-                    </Button>
-                    <Button variant="destructive" onClick={resetForm} className="flex-1">
-                      <RefreshCw /> Reset
-                    </Button>
-                  </div>
-                  <div className="flex space-x-4 mb-3 mt-5">
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="showFavicon"
-                        checked={showFavicon}
-                        onCheckedChange={(checked) => setShowFavicon(checked)}
-                      />
-                      <Label htmlFor="showFavicon">Show Favicon</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="showRating"
-                        checked={showRating}
-                        onCheckedChange={(checked) => setShowRating(checked)}
-                      />
-                      <Label htmlFor="showRating">Show Rating</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="showDate"
-                        checked={showDate}
-                        onCheckedChange={(checked) => setShowDate(checked)}
-                      />
-                      <Label htmlFor="showDate">Show Date</Label>
+                    <div className="flex space-x-4 mb-3 mt-5">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="showFavicon"
+                          checked={showFavicon}
+                          onCheckedChange={(checked) => setShowFavicon(!!checked)}
+                        />
+                        <Label htmlFor="showFavicon">Show Favicon</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="showRating"
+                          checked={showRating}
+                          onCheckedChange={(checked) => setShowRating(!!checked)}
+                        />
+                        <Label htmlFor="showRating">Show Rating</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="showDate"
+                          checked={showDate}
+                          onCheckedChange={(checked) => setShowDate(!!checked)}
+                        />
+                        <Label htmlFor="showDate">Show Date</Label>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            )}
-          </div>
-          {copyStatus && <p className="text-red-500 text-sm mt-4">{copyStatus}</p>}
-        </CardContent>
-      </Card>
+              )}
+            </div>
+            {copyStatus && <p className="text-red-500 text-sm mt-4">{copyStatus}</p>}
+          </CardContent>
+        </Card>
 
         {/* Share on WhatsApp Button */}
         <div className="flex justify-center items-center mt-6 mb-4">
@@ -274,55 +277,50 @@ export default function SiteFetcher() {
 
         <section className="mt-12 prose max-w-none opacity-100 transform-none">
           <h2 className="text-2xl font-semibold mb-4">
-            About Loan EMI Calculator
+            About SERP Snippet Preview Generator
           </h2>
           <div className="space-y-4">
             <p>
-              Our Loan EMI Calculator helps you plan your loans better by
-              calculating your Equated Monthly Installments (EMI) based on the
-              loan amount, interest rate, and tenure. This tool is essential for
-              making informed decisions about loans and understanding your
-              financial commitments.
+              Our SERP Snippet Preview Generator allows you to fetch and preview
+              how your website might appear in search engine results pages (SERPs).
+              Customize titles, descriptions, and toggle elements like favicons,
+              ratings, and dates to optimize your SEO strategy.
             </p>
             <h3 className="text-xl font-medium">Features:</h3>
             <ul className="list-disc pl-6 space-y-2">
               <li>
-                <strong>EMI Calculation:</strong> Calculate your monthly loan
-                payments
+                <strong>Real-Time Preview:</strong> See how your site looks in desktop or mobile SERPs.
               </li>
               <li>
-                <strong>Interest Breakdown:</strong> See total interest payable
+                <strong>Editable Fields:</strong> Adjust title and description with character counts.
               </li>
               <li>
-                <strong>Loan Analysis:</strong> View total payment including
-                principal and interest
+                <strong>Customization:</strong> Toggle favicon, rating, and date display.
               </li>
               <li>
-                <strong>Flexible Inputs:</strong> Adjust values using sliders or
-                enter them directly
+                <strong>Copy to Clipboard:</strong> Easily share or save your preview.
               </li>
             </ul>
             <h3 className="text-xl font-medium">Common Uses:</h3>
             <ul className="list-disc pl-6 space-y-2">
-              <li>Home loan planning</li>
-              <li>Car loan calculations</li>
-              <li>Personal loan assessment</li>
-              <li>Business loan analysis</li>
-              <li>Education loan planning</li>
+              <li>SEO optimization</li>
+              <li>Content marketing</li>
+              <li>Website audits</li>
+              <li>Competitor analysis</li>
+              <li>Presentation preparation</li>
             </ul>
             <h3 className="text-xl font-medium">How to Use:</h3>
             <ol className="list-decimal pl-6 space-y-2">
-              <li>Enter the loan amount using the slider or input field</li>
-              <li>Set the interest rate</li>
-              <li>Choose the loan tenure in years</li>
-              <li>View your monthly EMI amount</li>
-              <li>Check the total interest and payment details</li>
+              <li>Enter a domain (e.g., example.com).</li>
+              <li>Click "FETCH" to retrieve site data.</li>
+              <li>Edit the title and description as needed.</li>
+              <li>Toggle options to customize the preview.</li>
+              <li>Copy the result or reset to start over.</li>
             </ol>
             <p>
-              The calculator provides instant results as you adjust the values,
-              helping you understand how different loan parameters affect your
-              monthly payments. This makes it easier to choose a loan that fits
-              your budget and financial goals.
+              This tool provides a quick and effective way to visualize and refine
+              your SERP snippets, helping you improve click-through rates and search
+              visibility.
             </p>
           </div>
         </section>
@@ -339,10 +337,10 @@ export default function SiteFetcher() {
           </ul>
         </div>
         <div className="bg-muted rounded-lg p-4">
-          <h4 className="font-semibold mb-2">Calculator Stats</h4>
-          <p className="text-sm">Trusted by students and professionals</p>
+          <h4 className="font-semibold mb-2">Tool Stats</h4>
+          <p className="text-sm">Trusted by SEO professionals</p>
           <p className="text-xs mt-1 text-muted-foreground">
-            Over 10,000 calculations daily
+            Over 10,000 previews generated daily
           </p>
         </div>
 
@@ -361,7 +359,7 @@ export default function SiteFetcher() {
           <div className="flex items-center gap-1 mb-2">
             <div className="flex text-yellow-400">
               {Array(5)
-                .fill()
+                .fill(0)
                 .map((_, i) => (
                   <svg
                     key={i}
@@ -394,7 +392,7 @@ export default function SiteFetcher() {
                   <div className="text-lg font-semibold">Excellent</div>
                   <div className="flex text-[#00b67a]">
                     {Array(5)
-                      .fill()
+                      .fill(0)
                       .map((_, i) => (
                         <svg
                           key={i}
@@ -443,10 +441,6 @@ export default function SiteFetcher() {
           </Link>
         </div>
       </div>
-      
-
-
-
     </div>
   );
 }

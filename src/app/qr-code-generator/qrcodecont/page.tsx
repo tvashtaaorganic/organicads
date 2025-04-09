@@ -54,7 +54,7 @@ export default function QRCodeGenerator() {
         qrCodeInstance.current = null;
       }
     };
-  }, []);
+  }, [logo, qrColor, qrSize, qrStyle]);
 
   // Update QR code when data, size, color, style, or logo changes
   useEffect(() => {
@@ -141,7 +141,6 @@ export default function QRCodeGenerator() {
     }
   };
 
-
   const handleLogoDrop = (e) => {
     e.preventDefault();
     const file = e.dataTransfer.files[0];
@@ -159,7 +158,6 @@ export default function QRCodeGenerator() {
     const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
     window.open(url, "_blank");
   };
-
 
   return (
     <div className="container mx-auto grid grid-cols-1 md:grid-cols-12 gap-6 mt-10 max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -340,7 +338,7 @@ export default function QRCodeGenerator() {
                 </div>
               </div>
             )}
-            {type === "payment" && (
+            {type === "payment" || (
               <div className="space-y-5">
                 <div>
                   <Label htmlFor="payment-platform" className="mb-2">Platform</Label>

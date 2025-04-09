@@ -1,21 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import ytdl from "@distube/ytdl-core";
-import ffmpeg from "fluent-ffmpeg";
 import fs from "fs";
 import path from "path";
 import { Readable } from "stream";
 
-// Explicit FFmpeg path (Note: This won't work on Vercel; we'll address this below)
-const ffmpegPath = "C:\\ProgramData\\chocolatey\\bin\\ffmpeg.exe";
-if (fs.existsSync(ffmpegPath)) {
-  ffmpeg.setFfmpegPath(ffmpegPath);
-  console.log(`FFmpeg explicitly set to: ${ffmpegPath}`);
-} else {
-  console.error(`FFmpeg not found at: ${ffmpegPath}. Please check the path.`);
-}
-
-// Stats file path
-const statsFilePath = path.join(process.cwd(), "download-stats.json");
+// Stats file path (use /tmp for Vercel compatibility)
+const statsFilePath = path.join("/tmp", "download-stats.json");
 
 // Initialize stats if the file doesn't exist
 if (!fs.existsSync(statsFilePath)) {
@@ -28,6 +18,19 @@ if (!fs.existsSync(statsFilePath)) {
 let liveDownloads = 0;
 
 export async function GET(req: NextRequest) {
+  // Dynamically import ffmpeg and ffmpeg-installer inside the handler
+  const ffmpeg = require("fluent-ffmpeg") as any;
+  const ffmpegInstaller = require("@ffmpeg-installer/ffmpeg");
+
+  // Set FFmpeg path dynamically at runtime
+  try {
+    ffmpeg.setFfmpegPath(ffmpegInstaller.path);
+    console.log(`FFmpeg set to: ${ffmpegInstaller.path}`);
+  } catch (error) {
+    console.error("Failed to set FFmpeg path:", (error as Error).message);
+    return NextResponse.json({ error: "FFmpeg configuration failed" }, { status: 500 });
+  }
+
   const { searchParams } = new URL(req.url);
   const url = searchParams.get("url");
   const action = searchParams.get("action") || "download";
@@ -77,7 +80,7 @@ export async function GET(req: NextRequest) {
           }
         });
 
-      const videoFormats = Array.from(videoFormatsMap.values()).sort((a, b) => b.height - a.height); // Changed to const
+      const videoFormats = Array.from(videoFormatsMap.values()).sort((a, b) => b.height - a.height);
 
       if (videoFormats.length === 0) {
         return NextResponse.json({ error: "No video formats available" }, { status: 500 });
@@ -178,7 +181,7 @@ export async function GET(req: NextRequest) {
         },
       });
 
-      const tempDir = path.join(process.cwd(), "temp");
+      const tempDir = "/tmp"; // Vercel-compatible temp directory
       if (!fs.existsSync(tempDir)) {
         fs.mkdirSync(tempDir);
       }
@@ -212,7 +215,7 @@ export async function GET(req: NextRequest) {
             console.log("FFmpeg merge completed successfully");
             resolve(null);
           })
-          .on("error", (error: Error) => { // Changed 'err' to 'error' and used it
+          .on("error", (error: Error) => {
             console.error("FFmpeg merge error:", error.message);
             reject(error);
           })
@@ -227,7 +230,7 @@ export async function GET(req: NextRequest) {
         fs.unlinkSync(outputFilePath);
       });
 
-      stream.on("error", () => { // Removed unused 'err' parameter
+      stream.on("error", () => {
         if (fs.existsSync(videoFilePath)) fs.unlinkSync(videoFilePath);
         if (fs.existsSync(audioFilePath)) fs.unlinkSync(audioFilePath);
         if (fs.existsSync(outputFilePath)) fs.unlinkSync(outputFilePath);
@@ -253,7 +256,7 @@ export async function GET(req: NextRequest) {
       fs.writeFileSync(statsFilePath, JSON.stringify(updatedStats, null, 2));
     });
 
-    stream.on("error", () => { // Removed unused 'err' parameter
+    stream.on("error", () => {
       liveDownloads--;
       console.log(`Live downloads: ${liveDownloads}`);
       const updatedStats = JSON.parse(fs.readFileSync(statsFilePath, "utf-8"));
@@ -262,7 +265,7 @@ export async function GET(req: NextRequest) {
     });
 
     const encodedTitle = encodeURIComponent(title);
-    return new NextResponse(stream as Readable, { // Specified type instead of 'any'
+    return new NextResponse(stream as Readable, {
       headers: {
         "Content-Disposition": `attachment; filename*=UTF-8''${encodedTitle}.${format}`,
         "Content-Type": format === "mp3" ? "audio/mpeg" : "video/mp4",

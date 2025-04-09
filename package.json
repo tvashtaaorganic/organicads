@@ -4,13 +4,14 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
+    "build": "node --no-deprecation next build",
     "start": "next start",
     "lint": "next lint",
     "instagram-server": "node src/backend/instagram-server.js"
   },
   "dependencies": {
     "@distube/ytdl-core": "^4.16.6",
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "@google-cloud/vertexai": "^1.9.3",
     "@radix-ui/react-checkbox": "^1.1.4",
     "@radix-ui/react-dialog": "^1.1.6",
@@ -73,6 +74,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+    "@types/fluent-ffmpeg": "^2.1.27",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
