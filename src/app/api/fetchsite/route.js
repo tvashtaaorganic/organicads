@@ -9,15 +9,13 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    // Try both HTTP and HTTPS
     let url = `https://${domain.trim().replace(/^https?:\/\//, "")}`;
     let response = await fetch(url, {
       headers: { "User-Agent": "Mozilla/5.0" },
-      redirect: "follow", // Follow redirects
+      redirect: "follow",
     });
 
     if (!response.ok) {
-      // Fallback to HTTP if HTTPS fails
       url = `http://${domain.trim().replace(/^https?:\/\//, "")}`;
       response = await fetch(url, {
         headers: { "User-Agent": "Mozilla/5.0" },
@@ -38,7 +36,7 @@ export async function POST(req: NextRequest) {
     const metaTitle = (titleMatch[1] || "").trim() || `No title found for ${domain}`;
     const metaDescription =
       (metaDescriptionMatch[1] || "").trim() || `No description found for ${domain}`;
-    const date = new Date().toLocaleDateString(); // Use current date
+    const date = new Date().toLocaleDateString();
 
     const faviconUrl = await getFaviconUrl(domain);
 
@@ -83,7 +81,7 @@ async function getFaviconUrl(domain: string): Promise<string | null> {
       });
       if (response.ok) return url;
     } catch {
-      continue; // Removed unused 'err' parameter
+      continue;
     }
   }
   return null;
